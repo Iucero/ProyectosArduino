@@ -15,7 +15,7 @@ const int Back = 4;
 const int Set = 7;
 const int Up = 8;
 const int Dw = 12;
-//No ajustar el periodo de amanecer a menos de 5 minutos
+//No ajustar ningun periodo a menos de 5 minutos
 long HoraAmanecer = 7, MinutoAmanecer = 0, SegundoAmanecer = 0;
 long HoraManana = 7, MinutoManana = 30, SegundoManana = 0;
 long HoraMediaManana = 10, MinutoMediaManana = 0, SegundoMediaManana = 0;
@@ -25,11 +25,17 @@ long HoraMediaTarde = 14, MinutoMediaTarde = 0, SegundoMediaTarde = 0;
 long HoraAtardecer = 18, MinutoAtardecer = 30, SegundoAtardecer = 0;
 long HoraNoche = 19, MinutoNoche = 0, SegundoNoche = 0;
 
-int IntensityChannel1 = 255;
-int IntensityChannel2 = 255;
-int IntensityChannel3 = 255;
-int IntensityChannel4 = 255;
-int IntensityChannel5 = 255;
+int IntensityChannel1 = 0;
+int IntensityChannel2 = 0;
+int IntensityChannel3 = 0;
+int IntensityChannel4 = 0;
+int IntensityChannel5 = 0;
+
+int AimIntensityChannel1 = 0;
+int AimIntensityChannel2 = 0;
+int AimIntensityChannel3 = 0;
+int AimIntensityChannel4 = 0;
+int AimIntensityChannel5 = 0;
 
 int ProgramaSeleccionado=1;
 int value, opcion;
@@ -43,6 +49,11 @@ void setHoraFecha(int, int, int, int, int, int, int);
 void printDate(String, String, String);
 
 void initProgram();
+void initProgram1();
+void initProgram2();
+void initProgram3();
+void initProgram4();
+void initProgram5();
 
 //Al arrancar arduino ayudan a dar la franja horaria en la que nos encontramos
 boolean esAmanecer(time_t);
@@ -73,6 +84,8 @@ void enterMenu();
 void changeTime();
 void setProgram();
 void setManual();
+
+void adjustIntensity(int, int, int, int, int);
 
 String message_hour;
 
@@ -309,6 +322,23 @@ void printDate(String horaprint, String minutoprint, String segundoprint){
 }
 
 void initProgram(){
+  switch (ProgramaSeleccionado) {
+      case 1:
+        initPrograma1();
+        break;
+      case 2:
+        initPrograma2();
+        break;
+      case 3:
+        initPrograma3();
+        break; 
+      case 4:
+        initPrograma4();
+        break;
+      case 5:
+        initPrograma5();  
+        break;
+  } 
   if (esAmanecer()){
     switch (ProgramaSeleccionado) {
       case 1:
@@ -454,6 +484,61 @@ void initProgram(){
         break;  
     }       
   }
+}
+
+void initProgram1(){
+  long HoraAmanecer = 7, MinutoAmanecer = 0, SegundoAmanecer = 0;
+  long HoraManana = 7, MinutoManana = 30, SegundoManana = 0;
+  long HoraMediaManana = 10, MinutoMediaManana = 0, SegundoMediaManana = 0;
+  long HoraMediodia = 11, MinutoMediodia = 30, SegundoMediodia = 0;
+  long HoraTarde = 12, MinutoTarde = 30, SegundoTarde = 0;
+  long HoraMediaTarde = 14, MinutoMediaTarde = 0, SegundoMediaTarde = 0;
+  long HoraAtardecer = 18, MinutoAtardecer = 30, SegundoAtardecer = 0;
+  long HoraNoche = 19, MinutoNoche = 0, SegundoNoche = 0;  
+}
+
+void initProgram2(){
+  long HoraAmanecer = 7, MinutoAmanecer = 0, SegundoAmanecer = 0;
+  long HoraManana = 7, MinutoManana = 30, SegundoManana = 0;
+  long HoraMediaManana = 10, MinutoMediaManana = 0, SegundoMediaManana = 0;
+  long HoraMediodia = 11, MinutoMediodia = 30, SegundoMediodia = 0;
+  long HoraTarde = 12, MinutoTarde = 30, SegundoTarde = 0;
+  long HoraMediaTarde = 14, MinutoMediaTarde = 0, SegundoMediaTarde = 0;
+  long HoraAtardecer = 18, MinutoAtardecer = 30, SegundoAtardecer = 0;
+  long HoraNoche = 19, MinutoNoche = 0, SegundoNoche = 0;  
+}
+
+void initProgram3(){
+  long HoraAmanecer = 8, MinutoAmanecer = 0, SegundoAmanecer = 0;
+  long HoraManana = 8, MinutoManana = 30, SegundoManana = 0;
+  long HoraMediaManana = 11, MinutoMediaManana = 0, SegundoMediaManana = 0;
+  long HoraMediodia = 12, MinutoMediodia = 30, SegundoMediodia = 0;
+  long HoraTarde = 13, MinutoTarde = 30, SegundoTarde = 0;
+  long HoraMediaTarde = 15, MinutoMediaTarde = 0, SegundoMediaTarde = 0;
+  long HoraAtardecer = 19, MinutoAtardecer = 30, SegundoAtardecer = 0;
+  long HoraNoche = 20, MinutoNoche = 0, SegundoNoche = 0;  
+}
+
+void initProgram4(){
+  long HoraAmanecer = 8, MinutoAmanecer = 0, SegundoAmanecer = 0;
+  long HoraManana = 8, MinutoManana = 30, SegundoManana = 0;
+  long HoraMediaManana = 11, MinutoMediaManana = 0, SegundoMediaManana = 0;
+  long HoraMediodia = 12, MinutoMediodia = 30, SegundoMediodia = 0;
+  long HoraTarde = 13, MinutoTarde = 30, SegundoTarde = 0;
+  long HoraMediaTarde = 15, MinutoMediaTarde = 0, SegundoMediaTarde = 0;
+  long HoraAtardecer = 19, MinutoAtardecer = 30, SegundoAtardecer = 0;
+  long HoraNoche = 20, MinutoNoche = 0, SegundoNoche = 0;
+}
+
+void initProgram5(){
+  long HoraAmanecer = 9, MinutoAmanecer = 0, SegundoAmanecer = 0;
+  long HoraManana = 9, MinutoManana = 30, SegundoManana = 0;
+  long HoraMediaManana = 12, MinutoMediaManana = 0, SegundoMediaManana = 0;
+  long HoraMediodia = 13, MinutoMediodia = 15, SegundoMediodia = 0;
+  long HoraTarde = 13, MinutoTarde = 45, SegundoTarde = 0;
+  long HoraMediaTarde = 15, MinutoMediaTarde = 0, SegundoMediaTarde = 0;
+  long HoraAtardecer = 18, MinutoAtardecer = 30, SegundoAtardecer = 0;
+  long HoraNoche = 19, MinutoNoche = 0, SegundoNoche = 0;  
 }
 
 void enterMenu(){
@@ -698,124 +783,245 @@ void setManual(){
     delay(3000);
 }
 
+void adjustIntensity(Aim1, Aim2, Aim3, Aim4, Aim5){
+  while(Aim1 != IntensityChannel1 || Aim2 != IntensityChannel2 || Aim3 != IntensityChannel3 || Aim4 != IntensityChannel4 || Aim5 != IntensityChannel5){
+      if (Aim1 != IntensityChannel1) {
+         if(IntensityChannel1 > Aim1){
+              IntensityChannel1--;
+         } else {
+              IntensityChannel1++;
+         }
+         analogWrite(Channel1,IntensityChannel1);     
+      }
+      if (Aim2 != IntensityChannel2) {
+         if(IntensityChannel2 > Aim2){
+              IntensityChannel2--;
+         } else {
+              IntensityChannel2++;
+         }     
+         analogWrite(Channel2,IntensityChannel2);
+      }
+      if (Aim3 != IntensityChannel3) {
+         if(IntensityChannel3 > Aim3){
+              IntensityChannel3--;
+         } else {
+              IntensityChannel3++;
+         }     
+         analogWrite(Channel3,IntensityChannel3);
+      }
+      if (Aim4 != IntensityChannel4) {
+         if(IntensityChannel4 > Aim4){
+              IntensityChannel4--;
+         } else {
+              IntensityChannel4++;
+         }     
+         analogWrite(Channel4,IntensityChannel4);
+      }
+      if (Aim5 != IntensityChannel5) {
+         if(IntensityChannel5 > Aim5){
+              IntensityChannel5--;
+         } else {
+              IntensityChannel5++;
+         }     
+         analogWrite(Channel5,IntensityChannel5);
+      }
+      delay(350);
+  }
+}
+
 void Programa1(int hora){
   lcd.setCursor(0,0);
   lcd.print("Pr01 Updated    ");
-  delay(3000);
   lcd.setCursor(0,1);
   switch (hora) {
       case 1: //Amanecer
-        digitalWrite(Channel1,HIGH);
-        digitalWrite(Channel2,HIGH);
-        digitalWrite(Channel3,LOW);   
+        AimIntensityChannel1 = 128;
+        AimIntensityChannel2 = 64;
+        AimIntensityChannel3 = 64;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 128;
         break; 
       case 2: //Mañana
-        digitalWrite(Channel1,LOW);
-        digitalWrite(Channel2,HIGH);
-        digitalWrite(Channel3,LOW);
+        AimIntensityChannel1 = 128;
+        AimIntensityChannel2 = 128;
+        AimIntensityChannel3 = 128;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0;
         break;      
       case 3: //Media Mañana
-        digitalWrite(Channel1,LOW);
-        digitalWrite(Channel2,HIGH);
-        digitalWrite(Channel3,LOW);
+        AimIntensityChannel1 = 128;
+        AimIntensityChannel2 = 255;
+        AimIntensityChannel3 = 255;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0; 
         break;    
       case 4: //Mediodia
-        digitalWrite(Channel1,HIGH);
-        digitalWrite(Channel2,LOW);
-        digitalWrite(Channel3,LOW);
+        AimIntensityChannel1 = 128;
+        AimIntensityChannel2 = 255;
+        AimIntensityChannel3 = 255;
+        AimIntensityChannel4 = 128;
+        AimIntensityChannel5 = 128;
         break;      
       case 5: //Tarde
-        digitalWrite(Channel1,LOW);
-        digitalWrite(Channel2,HIGH);
-        digitalWrite(Channel3,LOW);
+        AimIntensityChannel1 = 128;
+        AimIntensityChannel2 = 255;
+        AimIntensityChannel3 = 255;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0;
         break;
       case 6: //Media tarde
-        digitalWrite(Channel1,LOW);
-        digitalWrite(Channel2,HIGH);
-        digitalWrite(Channel3,LOW);
+        AimIntensityChannel1 = 128;
+        AimIntensityChannel2 = 128;
+        AimIntensityChannel3 = 128;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0;
         break;  
       case 7: //Atardecer
-        digitalWrite(Channel1,HIGH);
-        digitalWrite(Channel2,HIGH);
-        digitalWrite(Channel3,LOW);
+        AimIntensityChannel1 = 128;
+        AimIntensityChannel2 = 64;
+        AimIntensityChannel3 = 64;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 128;
         break;      
       case 8: //Noche
-        digitalWrite(Channel1,HIGH);
-        digitalWrite(Channel2,HIGH);
-        digitalWrite(Channel3,HIGH);
+        AimIntensityChannel1 = 0;
+        AimIntensityChannel2 = 0;
+        AimIntensityChannel3 = 0;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0;
         break;
   }
+  adjustIntensity(AimIntensityChannel1, AimIntensityChannel2, AimIntensityChannel3, AimIntensityChannel4, AimIntensityChannel5);  
 }
 
 void Programa2(int hora){
   lcd.setCursor(0,0);
   lcd.print("Pr02 Updated    ");
-  delay(2000);
   lcd.setCursor(0,1);
   switch (hora) {
       case 1: //Amanecer
-        lcd.print("Es amanecer    ");
-        delay(2000);
-        digitalWrite(Channel1,HIGH);
-        digitalWrite(Channel2,HIGH);
-        digitalWrite(Channel3,LOW);
-        break;    
+        AimIntensityChannel1 = 0;
+        AimIntensityChannel2 = 64;
+        AimIntensityChannel3 = 128;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 128;
+        break; 
       case 2: //Mañana
-        lcd.print("Es manana    ");
-        delay(2000);
-        digitalWrite(Channel1,LOW);
-        digitalWrite(Channel2,HIGH);
-        digitalWrite(Channel3,LOW);
+        AimIntensityChannel1 = 0;
+        AimIntensityChannel2 = 128;
+        AimIntensityChannel3 = 192;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0;
         break;      
       case 3: //Media Mañana
-      lcd.print("Es manana2    ");
-        delay(2000);
-        digitalWrite(Channel1,HIGH);
-        digitalWrite(Channel2,LOW);
-        digitalWrite(Channel3,LOW);
+        AimIntensityChannel1 = 128;
+        AimIntensityChannel2 = 255;
+        AimIntensityChannel3 = 255;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0; 
         break;    
       case 4: //Mediodia
-      lcd.print("Es mediodia    ");
-        delay(2000);
-        digitalWrite(Channel1,LOW);
-        digitalWrite(Channel2,LOW);
-        digitalWrite(Channel3,LOW);
+        AimIntensityChannel1 = 128;
+        AimIntensityChannel2 = 255;
+        AimIntensityChannel3 = 255;
+        AimIntensityChannel4 = 128;
+        AimIntensityChannel5 = 128;
         break;      
       case 5: //Tarde
-      lcd.print("Es tarde      ");
-        delay(2000);
-        digitalWrite(Channel1,HIGH);
-        digitalWrite(Channel2,LOW);
-        digitalWrite(Channel3,LOW);
-        break;    
+        AimIntensityChannel1 = 128;
+        AimIntensityChannel2 = 255;
+        AimIntensityChannel3 = 255;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0;
+        break;
       case 6: //Media tarde
-      lcd.print("Es tarde1    ");
-        delay(2000);
-        digitalWrite(Channel1,LOW);
-        digitalWrite(Channel2,HIGH);
-        digitalWrite(Channel3,LOW);
+        AimIntensityChannel1 = 0;
+        AimIntensityChannel2 = 128;
+        AimIntensityChannel3 = 192;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0;
         break;  
       case 7: //Atardecer
-      lcd.print("Es atardecer      ");
-        delay(2000);
-        digitalWrite(Channel1,HIGH);
-        digitalWrite(Channel2,HIGH);
-        digitalWrite(Channel3,LOW);
+        AimIntensityChannel1 = 0;
+        AimIntensityChannel2 = 64;
+        AimIntensityChannel3 = 128;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 128;
         break;      
       case 8: //Noche
-      lcd.print("Es noche      ");
-        delay(2000);
-        digitalWrite(Channel1,HIGH);
-        digitalWrite(Channel2,HIGH);
-        digitalWrite(Channel3,HIGH);
-        break;      
+        AimIntensityChannel1 = 0;
+        AimIntensityChannel2 = 0;
+        AimIntensityChannel3 = 0;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0;
+        break;
   }
+  adjustIntensity(AimIntensityChannel1, AimIntensityChannel2, AimIntensityChannel3, AimIntensityChannel4, AimIntensityChannel5); 
 }
 
 void Programa3(int hora){
   lcd.setCursor(0,0);
   lcd.print("SeaLampControl Pr03");
   lcd.setCursor(0,1);
+  switch (hora) {
+      case 1: //Amanecer
+        AimIntensityChannel1 = 128;
+        AimIntensityChannel2 = 64;
+        AimIntensityChannel3 = 64;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 128;
+        break; 
+      case 2: //Mañana
+        AimIntensityChannel1 = 128;
+        AimIntensityChannel2 = 128;
+        AimIntensityChannel3 = 128;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0;
+        break;      
+      case 3: //Media Mañana
+        AimIntensityChannel1 = 128;
+        AimIntensityChannel2 = 255;
+        AimIntensityChannel3 = 255;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0; 
+        break;    
+      case 4: //Mediodia
+        AimIntensityChannel1 = 128;
+        AimIntensityChannel2 = 255;
+        AimIntensityChannel3 = 255;
+        AimIntensityChannel4 = 128;
+        AimIntensityChannel5 = 128;
+        break;      
+      case 5: //Tarde
+        AimIntensityChannel1 = 128;
+        AimIntensityChannel2 = 255;
+        AimIntensityChannel3 = 255;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0;
+        break;
+      case 6: //Media tarde
+        AimIntensityChannel1 = 128;
+        AimIntensityChannel2 = 128;
+        AimIntensityChannel3 = 128;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0;
+        break;  
+      case 7: //Atardecer
+        AimIntensityChannel1 = 128;
+        AimIntensityChannel2 = 64;
+        AimIntensityChannel3 = 64;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 128;
+        break;      
+      case 8: //Noche
+        AimIntensityChannel1 = 0;
+        AimIntensityChannel2 = 0;
+        AimIntensityChannel3 = 0;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0;
+        break;
+  }
+  adjustIntensity(AimIntensityChannel1, AimIntensityChannel2, AimIntensityChannel3, AimIntensityChannel4, AimIntensityChannel5);
   
 }
 
@@ -823,6 +1029,65 @@ void Programa4(int hora){
   lcd.setCursor(0,0);
   lcd.print("SeaLampControl Pr04");
   lcd.setCursor(0,1);
+  switch (hora) {
+      case 1: //Amanecer
+        AimIntensityChannel1 = 0;
+        AimIntensityChannel2 = 64;
+        AimIntensityChannel3 = 128;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 128;
+        break; 
+      case 2: //Mañana
+        AimIntensityChannel1 = 0;
+        AimIntensityChannel2 = 128;
+        AimIntensityChannel3 = 192;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0;
+        break;      
+      case 3: //Media Mañana
+        AimIntensityChannel1 = 128;
+        AimIntensityChannel2 = 255;
+        AimIntensityChannel3 = 255;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0; 
+        break;    
+      case 4: //Mediodia
+        AimIntensityChannel1 = 128;
+        AimIntensityChannel2 = 255;
+        AimIntensityChannel3 = 255;
+        AimIntensityChannel4 = 128;
+        AimIntensityChannel5 = 128;
+        break;      
+      case 5: //Tarde
+        AimIntensityChannel1 = 128;
+        AimIntensityChannel2 = 255;
+        AimIntensityChannel3 = 255;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0;
+        break;
+      case 6: //Media tarde
+        AimIntensityChannel1 = 0;
+        AimIntensityChannel2 = 128;
+        AimIntensityChannel3 = 192;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0;
+        break;  
+      case 7: //Atardecer
+        AimIntensityChannel1 = 0;
+        AimIntensityChannel2 = 64;
+        AimIntensityChannel3 = 128;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 128;
+        break;      
+      case 8: //Noche
+        AimIntensityChannel1 = 0;
+        AimIntensityChannel2 = 0;
+        AimIntensityChannel3 = 0;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0;
+        break;
+  }
+  adjustIntensity(AimIntensityChannel1, AimIntensityChannel2, AimIntensityChannel3, AimIntensityChannel4, AimIntensityChannel5);
   
 }
 
@@ -830,6 +1095,65 @@ void Programa5(int hora){
   lcd.setCursor(0,0);
   lcd.print("SeaLampControl Pr05");
   lcd.setCursor(0,1);
+  switch (hora) {
+      case 1: //Amanecer
+        AimIntensityChannel1 = 0;
+        AimIntensityChannel2 = 64;
+        AimIntensityChannel3 = 128;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 128;
+        break; 
+      case 2: //Mañana
+        AimIntensityChannel1 = 0;
+        AimIntensityChannel2 = 128;
+        AimIntensityChannel3 = 192;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0;
+        break;      
+      case 3: //Media Mañana
+        AimIntensityChannel1 = 128;
+        AimIntensityChannel2 = 255;
+        AimIntensityChannel3 = 255;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0; 
+        break;    
+      case 4: //Mediodia
+        AimIntensityChannel1 = 128;
+        AimIntensityChannel2 = 255;
+        AimIntensityChannel3 = 255;
+        AimIntensityChannel4 = 128;
+        AimIntensityChannel5 = 128;
+        break;      
+      case 5: //Tarde
+        AimIntensityChannel1 = 128;
+        AimIntensityChannel2 = 255;
+        AimIntensityChannel3 = 255;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0;
+        break;
+      case 6: //Media tarde
+        AimIntensityChannel1 = 0;
+        AimIntensityChannel2 = 128;
+        AimIntensityChannel3 = 192;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0;
+        break;  
+      case 7: //Atardecer
+        AimIntensityChannel1 = 0;
+        AimIntensityChannel2 = 64;
+        AimIntensityChannel3 = 128;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 128;
+        break;      
+      case 8: //Noche
+        AimIntensityChannel1 = 0;
+        AimIntensityChannel2 = 0;
+        AimIntensityChannel3 = 0;
+        AimIntensityChannel4 = 0;
+        AimIntensityChannel5 = 0;
+        break;
+  }
+  adjustIntensity(AimIntensityChannel1, AimIntensityChannel2, AimIntensityChannel3, AimIntensityChannel4, AimIntensityChannel5);
 }
 
 boolean esAmanecer(){
