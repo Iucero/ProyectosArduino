@@ -82,6 +82,12 @@ boolean esHoraTarde(time_t);
 boolean esHoraAtardecer(time_t);
 boolean esHoraNoche(time_t);
 
+void initPrograma1();
+void initPrograma2();
+void initPrograma3();
+void initPrograma4();
+void initPrograma5();
+
 void Programa1(int);
 void Programa2(int);
 void Programa3(int);
@@ -335,19 +341,19 @@ void printDate(String horaprint, String minutoprint, String segundoprint){
 void initProgram(){
   switch (ProgramaSeleccionado) {
       case 1:
-        initPrograma1();
+        initProgram1();
         break;
       case 2:
-        initPrograma2();
+        initProgram2();
         break;
       case 3:
-        initPrograma3();
+        initProgram3();
         break; 
       case 4:
-        initPrograma4();
+        initProgram4();
         break;
       case 5:
-        initPrograma5();  
+        initProgram5();  
         break;
   } 
   if (esAmanecer()){
@@ -809,7 +815,7 @@ void setManual(){
           value = digitalRead(Set);  //set 
           if (value == LOW) {
               setValueManual();
-              opcionprog = 0;
+              opcionmanual = 0;
           }        
     }
 }
@@ -838,7 +844,7 @@ void setValueManual(){
     analogWrite(Channel5, ManualIntensityChannel5);
 }
 
-void adjustIntensity(Aim1, Aim2, Aim3, Aim4, Aim5){
+void adjustIntensity(int Aim1,int Aim2,int Aim3,int Aim4,int Aim5){
   while(Aim1 != IntensityChannel1 || Aim2 != IntensityChannel2 || Aim3 != IntensityChannel3 || Aim4 != IntensityChannel4 || Aim5 != IntensityChannel5){
       if (Aim1 != IntensityChannel1) {
          if(IntensityChannel1 > Aim1){
