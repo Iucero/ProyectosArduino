@@ -88,11 +88,11 @@ void initPrograma3();
 void initPrograma4();
 void initPrograma5();
 
-void Programa1(int);
-void Programa2(int);
-void Programa3(int);
-void Programa4(int);
-void Programa5(int);
+void Programa1(int, boolean);
+void Programa2(int, boolean);
+void Programa3(int, boolean);
+void Programa4(int, boolean);
+void Programa5(int, boolean);
 
 void enterMenu();
 void changeTime();
@@ -100,14 +100,14 @@ void setProgram();
 void setManual();
 void setValueManual();
 
-void adjustIntensity(int, int, int, int, int);
+void adjustIntensity(int, int, int, int, int, boolean);
 
 String message_hour;
 
 boolean displayapagado;
 
 void setup() {
-  Serial.begin(9600);
+  //Serial.begin(9600);
   pinMode(Channel1,OUTPUT);
   pinMode(Channel2,OUTPUT);
   pinMode(Channel3,OUTPUT);
@@ -166,159 +166,159 @@ void loop() {
   lcd.print("SeaLampControl                    ");
   lcd.setCursor(0,1);
   printDate(String(myRTC.hours),String(myRTC.minutes),String(myRTC.seconds));
-  Serial.println(String(myRTC.hours)+":"+String(myRTC.minutes)+":"+String(myRTC.seconds));
+  //Serial.println(String(myRTC.hours)+":"+String(myRTC.minutes)+":"+String(myRTC.seconds));
   //Serial.println(String(myRTC.dayofmonth)+"/"+String(myRTC.month)+"/"+String(myRTC.year)+"   "+String(myRTC.hours)+":"+String(myRTC.minutes)+":"+String(myRTC.seconds)+"            ");
   if (manual != 2){ //SI estamos en modo manual no hacemos nada, la intensidad ya se fijó al configurar el modo manual.
    if (esHoraAmanecer()){
       lcd.print(" Amanecer");
       switch (ProgramaSeleccionado) {
         case 1:
-          Programa1(1);
+          Programa1(1, true);
           break;
         case 2:
-          Programa2(1);
+          Programa2(1, true);
           break;
         case 3:
-          Programa3(1);
+          Programa3(1, true);
           break;
         case 4:
-          Programa4(1);
+          Programa4(1, true);
           break;
         case 5:
-          Programa5(1);
+          Programa5(1, true);
           break;  
       }   
     } else if (esHoraManana()) {
       lcd.print(" Manana1");
       switch (ProgramaSeleccionado) {
         case 1:
-          Programa1(2);
+          Programa1(2, true);
           break;
         case 2:
-          Programa2(2);
+          Programa2(2, true);
           break;
         case 3:
-          Programa3(2);
+          Programa3(2, true);
           break;
         case 4:
-          Programa4(2);
+          Programa4(2, true);
           break;
         case 5:
-          Programa5(2);
+          Programa5(2, true);
           break;  
       }      
     } else if (esHoraMediaManana()) {
       lcd.print("  Manana2");
       switch (ProgramaSeleccionado) {
             case 1:
-              Programa1(3);
+              Programa1(3, true);
               break;
             case 2:
-              Programa2(3);
+              Programa2(3, true);
               break;
             case 3:
-              Programa3(3);
+              Programa3(3, true);
               break;
             case 4:
-              Programa4(3);
+              Programa4(3, true);
               break;
             case 5:
-              Programa5(3);
+              Programa5(3, true);
               break;  
           }      
     } else if (esHoraMediodia()) {
       lcd.print("  Mediodia");
       switch (ProgramaSeleccionado) {
             case 1:
-              Programa1(4);
+              Programa1(4, true);
               break;
             case 2:
-              Programa2(4);
+              Programa2(4, true);
               break;
             case 3:
-              Programa3(4);
+              Programa3(4, true);
               break;
             case 4:
-              Programa4(4);
+              Programa4(4, true);
               break;
             case 5:
-              Programa5(4);
+              Programa5(4, true);
               break;  
           }  
     } else if (esHoraTarde()) {
       lcd.print("  Tarde1");
       switch (ProgramaSeleccionado) {
             case 1:
-              Programa1(5);
+              Programa1(5, true);
               break;
             case 2:
-              Programa2(5);
+              Programa2(5, true);
               break;
             case 3:
-              Programa3(5);
+              Programa3(5, true);
               break;
             case 4:
-              Programa4(5);
+              Programa4(5, true);
               break;
             case 5:
-              Programa5(5);
+              Programa5(5, true);
               break;  
           }     
     } else if (esHoraMediaTarde()) {
       lcd.print("  Tarde2");
       switch (ProgramaSeleccionado) {
             case 1:
-              Programa1(6);
+              Programa1(6, true);
               break;
             case 2:
-              Programa2(6);
+              Programa2(6, true);
               break;
             case 3:
-              Programa3(6);
+              Programa3(6, true);
               break;
             case 4:
-              Programa4(6);
+              Programa4(6, true);
               break;
             case 5:
-              Programa5(6);
+              Programa5(6, true);
               break;  
           }      
     } else if (esHoraAtardecer()) {
       lcd.print("  Atardecer");
       switch (ProgramaSeleccionado) {
             case 1:
-              Programa1(7);
+              Programa1(7, true);
               break;
             case 2:
-              Programa2(7);
+              Programa2(7, true);
               break;
             case 3:
-              Programa3(7);
+              Programa3(7, true);
               break;
             case 4:
-              Programa4(7);
+              Programa4(7, true);
               break;
             case 5:
-              Programa5(7);
+              Programa5(7, true);
               break;  
           }      
     } else if (esHoraNoche()) {
         lcd.print("  Noche");
         switch (ProgramaSeleccionado) {
             case 1:
-              Programa1(8);
+              Programa1(8, true);
               break;
             case 2:
-              Programa2(8);
+              Programa2(8, true);
               break;
             case 3:
-              Programa3(8);
+              Programa3(8, true);
               break;
             case 4:
-              Programa4(8);
+              Programa4(8, true);
               break;
             case 5:
-              Programa5(8);
+              Programa5(8, true);
               break;  
           }      
     }
@@ -335,7 +335,11 @@ void printDate(String horaprint, String minutoprint, String segundoprint){
   if (segundoprint.length() < 2){
     segundoprint = "0"+segundoprint;
   }
-  lcd.print(horaprint+":"+minutoprint+":"+segundoprint+"        ");  
+  if (manual == 2) {
+    lcd.print(horaprint+":"+minutoprint+":"+segundoprint+"  Manual"); 
+  } else {
+    lcd.print(horaprint+":"+minutoprint+":"+segundoprint+"        "); 
+  } 
 }
 
 void initProgram(){
@@ -359,145 +363,145 @@ void initProgram(){
   if (esAmanecer()){
     switch (ProgramaSeleccionado) {
       case 1:
-        Programa1(1);
+        Programa1(1, false);
         break;
       case 2:
-        Programa2(1);
+        Programa2(1, false);
         break;
       case 3:
-        Programa3(1);
+        Programa3(1, false);
         break; 
       case 4:
-        Programa4(1);
+        Programa4(1, false);
         break;
       case 5:
-        Programa5(1);  
+        Programa5(1, false);  
         break;
     } 
   } else if (esManana()) {
     switch (ProgramaSeleccionado) {
       case 1:
-        Programa1(2);
+        Programa1(2, false);
         break;
       case 2:
-        Programa2(2);
+        Programa2(2, false);
         break;
       case 3:
-        Programa3(2);
+        Programa3(2, false);
         break;
       case 4:
-        Programa4(2);
+        Programa4(2, false);
         break;
       case 5:
-        Programa5(2);
+        Programa5(2, false);
         break;  
     }      
   } else if (esMediaManana()) {
     switch (ProgramaSeleccionado) {
       case 1:
-        Programa1(3);
+        Programa1(3, false);
         break;
       case 2:
-        Programa2(3);
+        Programa2(3, false);
         break;
       case 3:
-        Programa3(3);
+        Programa3(3, false);
         break;
       case 4:
-        Programa4(3);
+        Programa4(3, false);
         break;
       case 5:
-        Programa5(3);
+        Programa5(3, false);
         break;  
     } 
   } else if (esMediodia()) {
     switch (ProgramaSeleccionado) {
       case 1:
-        Programa1(4);
+        Programa1(4, false);
         break;
       case 2:
-        Programa2(4);
+        Programa2(4, false);
         break;
       case 3:
-        Programa3(4);
+        Programa3(4, false);
         break;
       case 4:
-        Programa4(4);
+        Programa4(4, false);
         break;
       case 5:
-        Programa5(4);
+        Programa5(4, false);
         break;  
     }      
   } else if (esTarde()) {
     switch (ProgramaSeleccionado) {
       case 1:
-        Programa1(5);
+        Programa1(5, false);
         break;
       case 2:
-        Programa2(5);
+        Programa2(5, false);
         break;
       case 3:
-        Programa3(5);
+        Programa3(5, false);
         break;
       case 4:
-        Programa4(5);
+        Programa4(5, false);
         break;
       case 5:
-        Programa5(5);
+        Programa5(5, false);
         break;  
     }  
   } else if (esMediaTarde()) {
     switch (ProgramaSeleccionado) {
       case 1:
-        Programa1(6);
+        Programa1(6, false);
         break;
       case 2:
-        Programa2(6);
+        Programa2(6, false);
         break;
       case 3:
-        Programa3(6);
+        Programa3(6, false);
         break;
       case 4:
-        Programa4(6);
+        Programa4(6, false);
         break;
       case 5:
-        Programa5(6);
+        Programa5(6, false);
         break;  
     } 
   } else if (esAtardecer()) {
     switch (ProgramaSeleccionado) {
       case 1:
-        Programa1(7);
+        Programa1(7, false);
         break;
       case 2:
-        Programa2(7);
+        Programa2(7, false);
         break;
       case 3:
-        Programa3(7);
+        Programa3(7, false);
         break;
       case 4:
-        Programa4(7);
+        Programa4(7, false);
         break;
       case 5:
-        Programa5(7);
+        Programa5(7, false);
         break;  
     }   
   } else if (esNoche()) {
     switch (ProgramaSeleccionado) {
       case 1:
-        Programa1(8);
+        Programa1(8, false);
         break;
       case 2:
-        Programa2(8);
+        Programa2(8, false);
         break;
       case 3:
-        Programa3(8);
+        Programa3(8, false);
         break;
       case 4:
-        Programa4(8);
+        Programa4(8, false);
         break;
       case 5:
-        Programa5(8);
+        Programa5(8, false);
         break;  
     }       
   }
@@ -797,9 +801,9 @@ void setManual(){
     lcd.print("Manual Mode     ");
     lcd.setCursor(0,1);
     if (manual == 2){
-        lcd.print("[ON] Manual");
+        lcd.print("[ON] Manual     ");
     } else {
-        lcd.print("[OFF] Manual");
+        lcd.print("[OFF] Manual    ");
     }
     int opcionmanual = 1;
     int valuemanual;
@@ -807,36 +811,154 @@ void setManual(){
     //while (millis() < finishhora || opcionhora != 0) {
     while (opcionmanual != 0) {
           delay(200);
-          lcd.setCursor(0,1);
           valuemanual = digitalRead(Back);  //back
           if (valuemanual == LOW) {
               opcionmanual = 0;
           }
           value = digitalRead(Set);  //set 
           if (value == LOW) {
-              setValueManual();
-              opcionmanual = 0;
+              if (manual == 2){
+                lcd.print("[OFF] Manual     ");
+                delay(500);
+                manual = 1;
+                ManualIntensityChannel1 = 128;
+                ManualIntensityChannel2 = 128;
+                ManualIntensityChannel3 = 128;
+                ManualIntensityChannel4 = 128;
+                ManualIntensityChannel5 = 128;
+                opcionmanual = 0; 
+              } else {
+                lcd.print("[ON] Manual     ");
+                delay(500);
+                manual = 2;
+                setValueManual();
+                opcionmanual = 0;
+              }
           }        
     }
 }
 
 void setValueManual(){
-    
-      
-          value = digitalRead(Up);  //up 
-          if (value == LOW) {
-              programaajustado++;
-              if (programaajustado>=3){
-                    programaajustado=1;
-              }
+      lcd.setCursor(0,1);
+      boolean exit = false;
+      for (int index=0; index < 5; index++){
+          while (!exit){
+            switch (index){
+              case 0:
+                lcd.setCursor(0,1);
+                lcd.print("CH1 Level "+String(ManualIntensityChannel1*100/256)+"%   ");
+                value = digitalRead(Up);  //up 
+                if (value == LOW) {
+                  ManualIntensityChannel1 = ManualIntensityChannel1 + 32;
+                  if (ManualIntensityChannel1 > 256){
+                    ManualIntensityChannel1 = 256;
+                  } 
+                }
+                value = digitalRead(Dw);  //dw 
+                if (value == LOW) {
+                  ManualIntensityChannel1 = ManualIntensityChannel1 - 32;
+                  if (ManualIntensityChannel1 < 0){
+                    ManualIntensityChannel1 = 0;
+                  }
+                }
+                value = digitalRead(Set);  //up 
+                if (value == LOW) {
+                  exit = true;
+                }    
+                break;
+              case 1:
+                lcd.setCursor(0,1);
+                lcd.print("CH2 Level "+String(ManualIntensityChannel2*100/256)+"%   ");
+                value = digitalRead(Up);  //up 
+                if (value == LOW) {
+                  ManualIntensityChannel2 = ManualIntensityChannel2 + 32;
+                  if (ManualIntensityChannel2 > 256){
+                    ManualIntensityChannel2 = 256;
+                  } 
+                }
+                value = digitalRead(Dw);  //dw 
+                if (value == LOW) {
+                  ManualIntensityChannel2 = ManualIntensityChannel2 - 32;
+                  if (ManualIntensityChannel2 < 0){
+                    ManualIntensityChannel2 = 0;
+                  }
+                }
+                value = digitalRead(Set);  //up 
+                if (value == LOW) {
+                  exit = true;
+                }    
+                break;
+              case 2:
+                lcd.setCursor(0,1);
+                lcd.print("CH3 Level "+String(ManualIntensityChannel3*100/256)+"%   ");
+                value = digitalRead(Up);  //up 
+                if (value == LOW) {
+                  ManualIntensityChannel3 = ManualIntensityChannel3 + 32;
+                  if (ManualIntensityChannel3 > 256){
+                    ManualIntensityChannel3 = 256;
+                  } 
+                }
+                value = digitalRead(Dw);  //dw 
+                if (value == LOW) {
+                  ManualIntensityChannel3 = ManualIntensityChannel3 - 32;
+                  if (ManualIntensityChannel3 < 0){
+                    ManualIntensityChannel3 = 0;
+                  }
+                }
+                value = digitalRead(Set);  //up 
+                if (value == LOW) {
+                  exit = true;
+                }    
+                break;
+              case 3:            
+                lcd.setCursor(0,1);
+                lcd.print("CH4 Level "+String(ManualIntensityChannel4*100/256)+"%   ");
+                value = digitalRead(Up);  //up 
+                if (value == LOW) {
+                  ManualIntensityChannel4 = ManualIntensityChannel4 + 32;
+                  if (ManualIntensityChannel4 > 256){
+                    ManualIntensityChannel4 = 256;
+                  } 
+                }
+                value = digitalRead(Dw);  //dw 
+                if (value == LOW) {
+                  ManualIntensityChannel4 = ManualIntensityChannel4 - 32;
+                  if (ManualIntensityChannel4 < 0){
+                    ManualIntensityChannel4 = 0;
+                  }
+                }
+                value = digitalRead(Set);  //up 
+                if (value == LOW) {
+                  exit = true;
+                }    
+                break;
+              case 4:              
+                lcd.setCursor(0,1);
+                lcd.print("CH5 Level "+String(ManualIntensityChannel5*100/256)+"%   ");
+                value = digitalRead(Up);  //up 
+                if (value == LOW) {
+                  ManualIntensityChannel5 = ManualIntensityChannel5 + 32;
+                  if (ManualIntensityChannel5 > 256){
+                    ManualIntensityChannel5 = 256;
+                  } 
+                }
+                value = digitalRead(Dw);  //dw 
+                if (value == LOW) {
+                  ManualIntensityChannel5 = ManualIntensityChannel5 - 32;
+                  if (ManualIntensityChannel5 < 0){
+                    ManualIntensityChannel5 = 0;
+                  }
+                }
+                value = digitalRead(Set);  //up 
+                if (value == LOW) {
+                  exit = true;
+                }    
+                break;            
+            }
           }
-          value = digitalRead(Dw);  //dw 
-          if (value == LOW) {
-              programaajustado--;
-              if (programaajustado<1){
-                    programaajustado=2;
-              }
-          }
+          exit = false;
+          
+      }
     analogWrite(Channel1, ManualIntensityChannel1);
     analogWrite(Channel2, ManualIntensityChannel2);
     analogWrite(Channel3, ManualIntensityChannel3);
@@ -844,53 +966,66 @@ void setValueManual(){
     analogWrite(Channel5, ManualIntensityChannel5);
 }
 
-void adjustIntensity(int Aim1,int Aim2,int Aim3,int Aim4,int Aim5){
-  while(Aim1 != IntensityChannel1 || Aim2 != IntensityChannel2 || Aim3 != IntensityChannel3 || Aim4 != IntensityChannel4 || Aim5 != IntensityChannel5){
-      if (Aim1 != IntensityChannel1) {
-         if(IntensityChannel1 > Aim1){
-              IntensityChannel1--;
-         } else {
-              IntensityChannel1++;
-         }
-         analogWrite(Channel1,IntensityChannel1);     
-      }
-      if (Aim2 != IntensityChannel2) {
-         if(IntensityChannel2 > Aim2){
-              IntensityChannel2--;
-         } else {
-              IntensityChannel2++;
-         }     
-         analogWrite(Channel2,IntensityChannel2);
-      }
-      if (Aim3 != IntensityChannel3) {
-         if(IntensityChannel3 > Aim3){
-              IntensityChannel3--;
-         } else {
-              IntensityChannel3++;
-         }     
-         analogWrite(Channel3,IntensityChannel3);
-      }
-      if (Aim4 != IntensityChannel4) {
-         if(IntensityChannel4 > Aim4){
-              IntensityChannel4--;
-         } else {
-              IntensityChannel4++;
-         }     
-         analogWrite(Channel4,IntensityChannel4);
-      }
-      if (Aim5 != IntensityChannel5) {
-         if(IntensityChannel5 > Aim5){
-              IntensityChannel5--;
-         } else {
-              IntensityChannel5++;
-         }     
-         analogWrite(Channel5,IntensityChannel5);
-      }
-      delay(350);
+void adjustIntensity(int Aim1,int Aim2,int Aim3,int Aim4,int Aim5, boolean gradually){
+  if (gradually){
+    while(Aim1 != IntensityChannel1 || Aim2 != IntensityChannel2 || Aim3 != IntensityChannel3 || Aim4 != IntensityChannel4 || Aim5 != IntensityChannel5){
+        if (Aim1 != IntensityChannel1) {
+           if(IntensityChannel1 > Aim1){
+                IntensityChannel1--;
+           } else {
+                IntensityChannel1++;
+           }
+           analogWrite(Channel1,IntensityChannel1);     
+        }
+        if (Aim2 != IntensityChannel2) {
+           if(IntensityChannel2 > Aim2){
+                IntensityChannel2--;
+           } else {
+                IntensityChannel2++;
+           }     
+           analogWrite(Channel2,IntensityChannel2);
+        }
+        if (Aim3 != IntensityChannel3) {
+           if(IntensityChannel3 > Aim3){
+                IntensityChannel3--;
+           } else {
+                IntensityChannel3++;
+           }     
+           analogWrite(Channel3,IntensityChannel3);
+        }
+        if (Aim4 != IntensityChannel4) {
+           if(IntensityChannel4 > Aim4){
+                IntensityChannel4--;
+           } else {
+                IntensityChannel4++;
+           }     
+           analogWrite(Channel4,IntensityChannel4);
+        }
+        if (Aim5 != IntensityChannel5) {
+           if(IntensityChannel5 > Aim5){
+                IntensityChannel5--;
+           } else {
+                IntensityChannel5++;
+           }     
+           analogWrite(Channel5,IntensityChannel5);
+        }
+        delay(350);
+    }
+  } else {
+    IntensityChannel1=Aim1;
+    IntensityChannel2=Aim2;
+    IntensityChannel3=Aim3;
+    IntensityChannel4=Aim4;
+    IntensityChannel5=Aim5;
+    analogWrite(Channel1,IntensityChannel1);
+    analogWrite(Channel2,IntensityChannel2);
+    analogWrite(Channel3,IntensityChannel3);
+    analogWrite(Channel4,IntensityChannel4);
+    analogWrite(Channel5,IntensityChannel5);  
   }
 }
 
-void Programa1(int hora){
+void Programa1(int hora, boolean gradually){
   lcd.setCursor(0,0);
   lcd.print("Pr01 Updated    ");
   lcd.setCursor(0,1);
@@ -952,10 +1087,10 @@ void Programa1(int hora){
         AimIntensityChannel5 = 0;
         break;
   }
-  adjustIntensity(AimIntensityChannel1, AimIntensityChannel2, AimIntensityChannel3, AimIntensityChannel4, AimIntensityChannel5);  
+  adjustIntensity(AimIntensityChannel1, AimIntensityChannel2, AimIntensityChannel3, AimIntensityChannel4, AimIntensityChannel5, gradually);  
 }
 
-void Programa2(int hora){
+void Programa2(int hora, boolean gradually){
   lcd.setCursor(0,0);
   lcd.print("Pr02 Updated    ");
   lcd.setCursor(0,1);
@@ -1017,10 +1152,10 @@ void Programa2(int hora){
         AimIntensityChannel5 = 0;
         break;
   }
-  adjustIntensity(AimIntensityChannel1, AimIntensityChannel2, AimIntensityChannel3, AimIntensityChannel4, AimIntensityChannel5); 
+  adjustIntensity(AimIntensityChannel1, AimIntensityChannel2, AimIntensityChannel3, AimIntensityChannel4, AimIntensityChannel5, gradually); 
 }
 
-void Programa3(int hora){
+void Programa3(int hora, boolean gradually){
   lcd.setCursor(0,0);
   lcd.print("SeaLampControl Pr03");
   lcd.setCursor(0,1);
@@ -1082,11 +1217,11 @@ void Programa3(int hora){
         AimIntensityChannel5 = 0;
         break;
   }
-  adjustIntensity(AimIntensityChannel1, AimIntensityChannel2, AimIntensityChannel3, AimIntensityChannel4, AimIntensityChannel5);
+  adjustIntensity(AimIntensityChannel1, AimIntensityChannel2, AimIntensityChannel3, AimIntensityChannel4, AimIntensityChannel5, gradually);
   
 }
 
-void Programa4(int hora){
+void Programa4(int hora, boolean gradually){
   lcd.setCursor(0,0);
   lcd.print("SeaLampControl Pr04");
   lcd.setCursor(0,1);
@@ -1148,11 +1283,11 @@ void Programa4(int hora){
         AimIntensityChannel5 = 0;
         break;
   }
-  adjustIntensity(AimIntensityChannel1, AimIntensityChannel2, AimIntensityChannel3, AimIntensityChannel4, AimIntensityChannel5);
+  adjustIntensity(AimIntensityChannel1, AimIntensityChannel2, AimIntensityChannel3, AimIntensityChannel4, AimIntensityChannel5, gradually);
   
 }
 
-void Programa5(int hora){
+void Programa5(int hora, boolean gradually){
   lcd.setCursor(0,0);
   lcd.print("SeaLampControl Pr05");
   lcd.setCursor(0,1);
@@ -1214,7 +1349,7 @@ void Programa5(int hora){
         AimIntensityChannel5 = 0;
         break;
   }
-  adjustIntensity(AimIntensityChannel1, AimIntensityChannel2, AimIntensityChannel3, AimIntensityChannel4, AimIntensityChannel5);
+  adjustIntensity(AimIntensityChannel1, AimIntensityChannel2, AimIntensityChannel3, AimIntensityChannel4, AimIntensityChannel5, gradually);
 }
 
 boolean esAmanecer(){
@@ -1234,7 +1369,7 @@ boolean esManana(){
   long hora_actual = long(myRTC.hours)*3600 + long(myRTC.minutes)*60 + long(myRTC.seconds);
   long hora_mediamanana = HoraMediaManana*3600+MinutoMediaManana*60+SegundoMediaManana;
   long hora_manana = HoraManana*3600+MinutoManana*60+SegundoManana;
-  Serial.println("HoraActual: "+String(myRTC.hours)+" HoraMediaManana "+String(hora_mediamanana)+" HoraManana "+String(hora_manana));
+  //Serial.println("HoraActual: "+String(myRTC.hours)+" HoraMediaManana "+String(hora_mediamanana)+" HoraManana "+String(hora_manana));
   if ((hora_actual >= hora_manana) && (hora_actual < hora_mediamanana)){
     return true;
   } else {
