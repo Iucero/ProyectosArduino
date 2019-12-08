@@ -10,11 +10,17 @@ const int Channel2 = 6;
 const int Channel3 = 9;
 const int Channel4 = 10;
 const int Channel5 = 11;
-const int Menu = 0;
-const int Back = 4;
-const int Set = 7;
-const int Up = 8;
-const int Dw = 12;
+// Joystick pin numbers
+const int SW_pin = 0; // digital pin connected to switch output
+const int X_pin = 0; // analog pin connected to X output
+const int Y_pin = 1; // analog pin connected to Y output
+int x_value = 500;
+int y_value = 500;
+//const int Menu = 0;
+//const int Back = 4;
+//const int Set = 7;
+//const int Up = 8;
+//const int Dw = 12;
 //No ajustar ningun periodo a menos de 5 minutos
 long HoraAmanecer = 7, MinutoAmanecer = 0, SegundoAmanecer = 0;
 long HoraManana = 7, MinutoManana = 30, SegundoManana = 0;
@@ -51,6 +57,7 @@ int horaajustada;
 int minutoajustado;
 int segundoajustado;
 int programaajustado;
+int counterDisplay;
 
 void setHoraFecha(int, int, int, int, int, int, int);
 
@@ -118,47 +125,47 @@ void setup() {
   analogWrite(Channel3,0);
   analogWrite(Channel4,0);
   analogWrite(Channel5,0);
-  pinMode(Menu, INPUT_PULLUP);   //Menu
-  pinMode(Back, INPUT_PULLUP);   //Back
-  pinMode(Set, INPUT_PULLUP);   //Set
-  pinMode(Up, INPUT_PULLUP);   //Up
-  pinMode(Dw, INPUT_PULLUP);   //Dw
+  pinMode(SW_pin, INPUT_PULLUP);
+  //pinMode(Menu, INPUT_PULLUP);   //Menu
+  //pinMode(Back, INPUT_PULLUP);   //Back
+  //pinMode(Set, INPUT_PULLUP);   //Set
+  //pinMode(Up, INPUT_PULLUP);   //Up
+  //pinMode(Dw, INPUT_PULLUP);   //Dw
   
   initProgram();
   lcd.init();
   lcd.backlight();
   lcd.home();
   lcd.setCursor(0,0);
-  lcd.print("SeaLampControl");
+  lcd.print("SeaLampControl  ");
   lcd.setCursor(0,1);
   printDate(String(myRTC.hours),String(myRTC.minutes),String(myRTC.seconds));
   //Serial.println(String(myRTC.hours)+":"+String(myRTC.minutes)+":"+String(myRTC.seconds)+"             ");
   delay(1000);
   displayapagado=true;
+  counterDisplay=1;
   lcd.noBacklight();
 }
 
 void loop() {
-  //lcd.clear();
+  delay(100);
+  counterDisplay--;
+  if (counterDisplay == 0){
+    counterDisplay = 1;
+    lcd.noBacklight();
+    displayapagado=true;   
+  }
   lcd.setCursor(0,1);
-  value = digitalRead(Menu);  //lectura digital de pin 
+  value = digitalRead(SW_pin);  //lectura digital de pin 
   if (value == LOW) {
     delay(500);
       if (displayapagado==false) {
       //  lcd.print("Menu        ");
         enterMenu();
-      }       
-  }
-  value = digitalRead(Set);  //lectura digital de pin 
-  if (value == LOW) {
-      if (displayapagado==true) {
-        delay(500);
-        lcd.backlight();
-        displayapagado=false;
       } else {
-        delay(500);
-        lcd.noBacklight();
-        displayapagado=true;   
+        lcd.backlight();
+        counterDisplay = 100;
+        displayapagado=false;        
       }
   }
   myRTC.updateTime();
@@ -338,7 +345,7 @@ void printDate(String horaprint, String minutoprint, String segundoprint){
   if (manual == 2) {
     lcd.print(horaprint+":"+minutoprint+":"+segundoprint+"  Manual"); 
   } else {
-    lcd.print(horaprint+":"+minutoprint+":"+segundoprint+"        "); 
+    lcd.print(horaprint+":"+minutoprint+":"+segundoprint+"  Pr0"+ProgramaSeleccionado+"  "); 
   } 
 }
 
@@ -587,12 +594,13 @@ void enterMenu(){
       while (millis() < finish) {
          // lo que este aqui dentro tiene 10 segundos para ejecutarse
          // o puedes salir con break*/
-        value = digitalRead(Back);  //back
-        if (value == LOW) {
+        x_value = analogRead(X_pin);
+        y_value = analogRead(Y_pin);
+        if (y_value > 900) {
             opcion = 0;
             break;
         }
-        value = digitalRead(Set);  //set 
+        value = digitalRead(SW_pin);  //set 
         if (value == LOW) {
             switch (opcion) {
               case 1:
@@ -625,8 +633,8 @@ void enterMenu(){
             }
            break;
         }
-        value = digitalRead(Up);  //up 
-        if (value == LOW) {
+        //up 
+        if (x_value > 900) {
             opcion++;
             if (opcion == 5){
               opcion = 1;
@@ -634,8 +642,8 @@ void enterMenu(){
             //delay(1000);
             break;
         }
-        value = digitalRead(Dw);  //dw 
-        if (value == LOW) {
+        //dw 
+        if (x_value < 100) {
             opcion--;
             if (opcion == 0){
               opcion = 4;
@@ -677,14 +685,15 @@ void changeTime(){
           }
            // lo que este aqui dentro tiene 10 segundos para ejecutarse
            // o puedes salir con break
-          value = digitalRead(Back);  //back
-          if (value == LOW) {
+          x_value = analogRead(X_pin);
+          y_value = analogRead(Y_pin);
+          if (y_value > 900) { //BACK
               horaajustada = myRTC.hours;
               minutoajustado = myRTC.minutes;
               segundoajustado = myRTC.seconds;
               opcionhora = 0;
           }
-          value = digitalRead(Set);  //set 
+          value = digitalRead(SW_pin);  //set 
           if (value == LOW) {
               switch (opcionhora) {
                 case 1: //set hora
@@ -698,8 +707,8 @@ void changeTime(){
                   break;
               }
           }
-          value = digitalRead(Up);  //up 
-          if (value == LOW) {
+          //up 
+          if (x_value > 900) {
               switch (opcionhora) {
                 case 1: //set hora
                   horaajustada++;
@@ -721,8 +730,8 @@ void changeTime(){
                   break;
               }
           }
-          value = digitalRead(Dw);  //dw 
-          if (value == LOW) {
+          //dw 
+          if (x_value < 100) {
               switch (opcionhora) {
                 case 1: //set hora
                   horaajustada--;
@@ -755,7 +764,7 @@ void setHoraFecha(int segundo, int minuto, int hora24, int diasemana, int diames
 
 void setProgram(){
     lcd.setCursor(0,0);
-    lcd.print("Select Pr: 1-2  ");
+    lcd.print("Select Pr: 1-2-3-4-5  ");
     programaajustado=ProgramaSeleccionado;
     int opcionprog = 1;
     //unsigned long finishhora = millis()+120000UL; // cargo a start con el valor +10mil milisegundos
@@ -768,27 +777,29 @@ void setProgram(){
           } else {
             lcd.print("Program: _      ");            
           }
-          value = digitalRead(Back);  //back
-          if (value == LOW) {
+          x_value = analogRead(X_pin);
+          y_value = analogRead(Y_pin);
+           //back
+          if (y_value > 900) {
               programaajustado = ProgramaSeleccionado;
               opcionprog = 0;
           }
-          value = digitalRead(Set);  //set 
+          value = digitalRead(SW_pin);  //set 
           if (value == LOW) {
               opcionprog = 0;
           }
-          value = digitalRead(Up);  //up 
-          if (value == LOW) {
+          //up 
+          if (x_value > 900) {
               programaajustado++;
-              if (programaajustado>=3){
+              if (programaajustado>=6){
                     programaajustado=1;
               }
           }
-          value = digitalRead(Dw);  //dw 
-          if (value == LOW) {
+          //dw 
+          if (x_value < 100) {
               programaajustado--;
               if (programaajustado<1){
-                    programaajustado=2;
+                    programaajustado=5;
               }
           }
     }
@@ -811,12 +822,14 @@ void setManual(){
     //while (millis() < finishhora || opcionhora != 0) {
     while (opcionmanual != 0) {
           delay(200);
-          valuemanual = digitalRead(Back);  //back
-          if (valuemanual == LOW) {
+          x_value = analogRead(X_pin);
+          y_value = analogRead(Y_pin);
+          //back
+          if (y_value > 900) {
               opcionmanual = 0;
           }
-          value = digitalRead(Set);  //set 
-          if (value == LOW) {
+          valuemanual = digitalRead(SW_pin);  //set 
+          if (valuemanual == LOW) {
               if (manual == 2){
                 lcd.print("[OFF] Manual     ");
                 delay(500);
@@ -843,25 +856,28 @@ void setValueManual(){
       boolean exit = false;
       for (int index=0; index < 5; index++){
           while (!exit){
+            delay(200);
+            x_value = analogRead(X_pin);
+            y_value = analogRead(Y_pin);
             switch (index){
               case 0:
                 lcd.setCursor(0,1);
                 lcd.print("CH1 Level "+String(ManualIntensityChannel1*100/256)+"%   ");
-                value = digitalRead(Up);  //up 
-                if (value == LOW) {
+                //up 
+                if (x_value > 900) {
                   ManualIntensityChannel1 = ManualIntensityChannel1 + 32;
                   if (ManualIntensityChannel1 > 256){
                     ManualIntensityChannel1 = 256;
                   } 
                 }
-                value = digitalRead(Dw);  //dw 
-                if (value == LOW) {
+                //dw 
+                if (x_value < 100) {
                   ManualIntensityChannel1 = ManualIntensityChannel1 - 32;
                   if (ManualIntensityChannel1 < 0){
                     ManualIntensityChannel1 = 0;
                   }
                 }
-                value = digitalRead(Set);  //up 
+                value = digitalRead(SW_pin);  //up 
                 if (value == LOW) {
                   exit = true;
                 }    
@@ -869,21 +885,21 @@ void setValueManual(){
               case 1:
                 lcd.setCursor(0,1);
                 lcd.print("CH2 Level "+String(ManualIntensityChannel2*100/256)+"%   ");
-                value = digitalRead(Up);  //up 
-                if (value == LOW) {
+                //up 
+                if (x_value > 900) {
                   ManualIntensityChannel2 = ManualIntensityChannel2 + 32;
                   if (ManualIntensityChannel2 > 256){
                     ManualIntensityChannel2 = 256;
                   } 
                 }
-                value = digitalRead(Dw);  //dw 
-                if (value == LOW) {
+                //dw 
+                if (x_value < 100) {
                   ManualIntensityChannel2 = ManualIntensityChannel2 - 32;
                   if (ManualIntensityChannel2 < 0){
                     ManualIntensityChannel2 = 0;
                   }
                 }
-                value = digitalRead(Set);  //up 
+                value = digitalRead(SW_pin);  //up 
                 if (value == LOW) {
                   exit = true;
                 }    
@@ -891,21 +907,21 @@ void setValueManual(){
               case 2:
                 lcd.setCursor(0,1);
                 lcd.print("CH3 Level "+String(ManualIntensityChannel3*100/256)+"%   ");
-                value = digitalRead(Up);  //up 
-                if (value == LOW) {
+                //up 
+                if (x_value > 900) {
                   ManualIntensityChannel3 = ManualIntensityChannel3 + 32;
                   if (ManualIntensityChannel3 > 256){
                     ManualIntensityChannel3 = 256;
                   } 
                 }
-                value = digitalRead(Dw);  //dw 
-                if (value == LOW) {
+                //dw 
+                if (x_value < 100) {
                   ManualIntensityChannel3 = ManualIntensityChannel3 - 32;
                   if (ManualIntensityChannel3 < 0){
                     ManualIntensityChannel3 = 0;
                   }
                 }
-                value = digitalRead(Set);  //up 
+                value = digitalRead(SW_pin);  //up 
                 if (value == LOW) {
                   exit = true;
                 }    
@@ -913,21 +929,21 @@ void setValueManual(){
               case 3:            
                 lcd.setCursor(0,1);
                 lcd.print("CH4 Level "+String(ManualIntensityChannel4*100/256)+"%   ");
-                value = digitalRead(Up);  //up 
-                if (value == LOW) {
+                //up 
+                if (x_value > 900) {
                   ManualIntensityChannel4 = ManualIntensityChannel4 + 32;
                   if (ManualIntensityChannel4 > 256){
                     ManualIntensityChannel4 = 256;
                   } 
                 }
-                value = digitalRead(Dw);  //dw 
-                if (value == LOW) {
+                //dw 
+                if (x_value < 100) {
                   ManualIntensityChannel4 = ManualIntensityChannel4 - 32;
                   if (ManualIntensityChannel4 < 0){
                     ManualIntensityChannel4 = 0;
                   }
                 }
-                value = digitalRead(Set);  //up 
+                value = digitalRead(SW_pin);  //up 
                 if (value == LOW) {
                   exit = true;
                 }    
@@ -935,21 +951,21 @@ void setValueManual(){
               case 4:              
                 lcd.setCursor(0,1);
                 lcd.print("CH5 Level "+String(ManualIntensityChannel5*100/256)+"%   ");
-                value = digitalRead(Up);  //up 
-                if (value == LOW) {
+                //up 
+                if (x_value > 900) {
                   ManualIntensityChannel5 = ManualIntensityChannel5 + 32;
                   if (ManualIntensityChannel5 > 256){
                     ManualIntensityChannel5 = 256;
                   } 
                 }
-                value = digitalRead(Dw);  //dw 
-                if (value == LOW) {
+                //dw 
+                if (x_value < 100) {
                   ManualIntensityChannel5 = ManualIntensityChannel5 - 32;
                   if (ManualIntensityChannel5 < 0){
                     ManualIntensityChannel5 = 0;
                   }
                 }
-                value = digitalRead(Set);  //up 
+                value = digitalRead(SW_pin);  //up 
                 if (value == LOW) {
                   exit = true;
                 }    
@@ -959,11 +975,7 @@ void setValueManual(){
           exit = false;
           
       }
-    analogWrite(Channel1, ManualIntensityChannel1);
-    analogWrite(Channel2, ManualIntensityChannel2);
-    analogWrite(Channel3, ManualIntensityChannel3);
-    analogWrite(Channel4, ManualIntensityChannel4);
-    analogWrite(Channel5, ManualIntensityChannel5);
+      adjustIntensity(ManualIntensityChannel1, ManualIntensityChannel2, ManualIntensityChannel3, ManualIntensityChannel4, ManualIntensityChannel5, false);
 }
 
 void adjustIntensity(int Aim1,int Aim2,int Aim3,int Aim4,int Aim5, boolean gradually){
