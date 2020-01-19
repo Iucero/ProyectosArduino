@@ -5,11 +5,11 @@
 MyRealTimeClock myRTC(3, 1, 2);
 LiquidCrystal_I2C lcd(0x3F, 16, 2);
   
-const int Channel1 = 5;
-const int Channel2 = 6;
+const int Channel1 = 11;
+const int Channel2 = 10;
 const int Channel3 = 9;
-const int Channel4 = 10;
-const int Channel5 = 11;
+const int Channel4 = 6;
+const int Channel5 = 5;
 // Joystick pin numbers
 const int SW_pin = 0; // digital pin connected to switch output
 const int X_pin = 0; // analog pin connected to X output
@@ -45,11 +45,11 @@ int AimIntensityChannel5 = 0;
 
 int manual = 1;
 
-int ManualIntensityChannel1 = 128;
-int ManualIntensityChannel2 = 128;
-int ManualIntensityChannel3 = 128;
-int ManualIntensityChannel4 = 128;
-int ManualIntensityChannel5 = 128;
+int ManualIntensityChannel1 = 9;
+int ManualIntensityChannel2 = 9;
+int ManualIntensityChannel3 = 9;
+int ManualIntensityChannel4 = 9;
+int ManualIntensityChannel5 = 9;
 
 int ProgramaSeleccionado=1;
 int value, opcion;
@@ -113,6 +113,8 @@ String message_hour;
 
 boolean displayapagado;
 
+int interrupt_timer = 0;
+
 void setup() {
   //Serial.begin(9600);
   pinMode(Channel1,OUTPUT);
@@ -120,17 +122,34 @@ void setup() {
   pinMode(Channel3,OUTPUT);
   pinMode(Channel4,OUTPUT);
   pinMode(Channel5,OUTPUT);
-  analogWrite(Channel1,0);
-  analogWrite(Channel2,0);
-  analogWrite(Channel3,0);
-  analogWrite(Channel4,0);
-  analogWrite(Channel5,0);
+  digitalWrite(Channel1,0);
+  digitalWrite(Channel2,0);
+  digitalWrite(Channel3,0);
+  digitalWrite(Channel4,0);
+  digitalWrite(Channel5,0);
   pinMode(SW_pin, INPUT_PULLUP);
-  //pinMode(Menu, INPUT_PULLUP);   //Menu
-  //pinMode(Back, INPUT_PULLUP);   //Back
-  //pinMode(Set, INPUT_PULLUP);   //Set
-  //pinMode(Up, INPUT_PULLUP);   //Up
-  //pinMode(Dw, INPUT_PULLUP);   //Dw
+
+  //Configuro el timer 2 para generar la señal pwm para los led que tendrá una frecuencia de 12Hz aproximadamente. Configuro el timer a frecuencia 244Hz 
+  //y con un contador de 20 (interrupt_timer) genero la frecuencia de 12Hz.
+  cli();//stop interrupts
+  
+  //set timer1 interrupt at 244Hz
+  TCCR1A = 0;// set entire TCCR1A register to 0
+  TCCR1B = 0;// same for TCCR1B
+  TCNT1  = 0;//initialize counter value to 0
+  // set compare match register for 1hz increments
+  OCR1A = 16000;// = (16*10^6) / (1000) - 1 (must be <65536)
+  //OCR1A = 65535;// = (16*10^6) / (244) - 1 (must be <65536)
+  // turn on CTC mode
+  TCCR1B |= (1 << WGM12);
+  // Set CS10 and CS12 bits for 1 prescaler
+  TCCR1B |= (1 << CS10);  
+  // enable timer compare interrupt
+  TIMSK1 |= (1 << OCIE1A);
+
+
+  sei();//allow interrupts
+
   
   initProgram();
   lcd.init();
@@ -145,6 +164,7 @@ void setup() {
   displayapagado=true;
   counterDisplay=1;
   lcd.noBacklight();
+    
 }
 
 void loop() {
@@ -834,11 +854,11 @@ void setManual(){
                 lcd.print("[OFF] Manual     ");
                 delay(500);
                 manual = 1;
-                ManualIntensityChannel1 = 128;
-                ManualIntensityChannel2 = 128;
-                ManualIntensityChannel3 = 128;
-                ManualIntensityChannel4 = 128;
-                ManualIntensityChannel5 = 128;
+                ManualIntensityChannel1 = 10;
+                ManualIntensityChannel2 = 10;
+                ManualIntensityChannel3 = 10;
+                ManualIntensityChannel4 = 10;
+                ManualIntensityChannel5 = 10;
                 opcionmanual = 0; 
               } else {
                 lcd.print("[ON] Manual     ");
@@ -861,18 +881,23 @@ void setValueManual(){
             y_value = analogRead(Y_pin);
             switch (index){
               case 0:
-                lcd.setCursor(0,1);
-                lcd.print("CH1 Level "+String(ManualIntensityChannel1*100/256)+"%   ");
+                if (ManualIntensityChannel1 == 0){
+                  lcd.setCursor(0,1);
+                  lcd.print("CH1 Level "+String(ManualIntensityChannel1*100/20)+"%   ");
+                } else {
+                  lcd.setCursor(0,1);
+                  lcd.print("CH1 Level "+String((ManualIntensityChannel1+1)*100/20)+"%   ");
+                }
                 //up 
                 if (x_value > 900) {
-                  ManualIntensityChannel1 = ManualIntensityChannel1 + 32;
-                  if (ManualIntensityChannel1 > 256){
-                    ManualIntensityChannel1 = 256;
+                  ManualIntensityChannel1 = ManualIntensityChannel1 + 1;
+                  if (ManualIntensityChannel1 > 19){
+                    ManualIntensityChannel1 = 19;
                   } 
                 }
                 //dw 
                 if (x_value < 100) {
-                  ManualIntensityChannel1 = ManualIntensityChannel1 - 32;
+                  ManualIntensityChannel1 = ManualIntensityChannel1 - 1;
                   if (ManualIntensityChannel1 < 0){
                     ManualIntensityChannel1 = 0;
                   }
@@ -884,17 +909,21 @@ void setValueManual(){
                 break;
               case 1:
                 lcd.setCursor(0,1);
-                lcd.print("CH2 Level "+String(ManualIntensityChannel2*100/256)+"%   ");
+                if (ManualIntensityChannel2 == 0){
+                  lcd.print("CH2 Level "+String(ManualIntensityChannel2*100/20)+"%   ");
+                } else {
+                  lcd.print("CH2 Level "+String((ManualIntensityChannel2+1)*100/20)+"%   ");
+                }
                 //up 
                 if (x_value > 900) {
-                  ManualIntensityChannel2 = ManualIntensityChannel2 + 32;
-                  if (ManualIntensityChannel2 > 256){
-                    ManualIntensityChannel2 = 256;
+                  ManualIntensityChannel2 = ManualIntensityChannel2 + 1;
+                  if (ManualIntensityChannel2 > 19){
+                    ManualIntensityChannel2 = 19;
                   } 
                 }
                 //dw 
                 if (x_value < 100) {
-                  ManualIntensityChannel2 = ManualIntensityChannel2 - 32;
+                  ManualIntensityChannel2 = ManualIntensityChannel2 - 1;
                   if (ManualIntensityChannel2 < 0){
                     ManualIntensityChannel2 = 0;
                   }
@@ -906,17 +935,21 @@ void setValueManual(){
                 break;
               case 2:
                 lcd.setCursor(0,1);
-                lcd.print("CH3 Level "+String(ManualIntensityChannel3*100/256)+"%   ");
+                if (ManualIntensityChannel3 == 0){
+                  lcd.print("CH3 Level "+String(ManualIntensityChannel3*100/20)+"%   ");
+                } else {
+                  lcd.print("CH3 Level "+String((ManualIntensityChannel3+1)*100/20)+"%   ");
+                }
                 //up 
                 if (x_value > 900) {
-                  ManualIntensityChannel3 = ManualIntensityChannel3 + 32;
-                  if (ManualIntensityChannel3 > 256){
-                    ManualIntensityChannel3 = 256;
+                  ManualIntensityChannel3 = ManualIntensityChannel3 + 1;
+                  if (ManualIntensityChannel3 > 19){
+                    ManualIntensityChannel3 = 19;
                   } 
                 }
                 //dw 
                 if (x_value < 100) {
-                  ManualIntensityChannel3 = ManualIntensityChannel3 - 32;
+                  ManualIntensityChannel3 = ManualIntensityChannel3 - 1;
                   if (ManualIntensityChannel3 < 0){
                     ManualIntensityChannel3 = 0;
                   }
@@ -928,17 +961,21 @@ void setValueManual(){
                 break;
               case 3:            
                 lcd.setCursor(0,1);
-                lcd.print("CH4 Level "+String(ManualIntensityChannel4*100/256)+"%   ");
+                if (ManualIntensityChannel4 == 0){
+                  lcd.print("CH4 Level "+String(ManualIntensityChannel4*100/20)+"%   ");
+                } else {
+                  lcd.print("CH4 Level "+String((ManualIntensityChannel4+1)*100/20)+"%   ");
+                }
                 //up 
                 if (x_value > 900) {
-                  ManualIntensityChannel4 = ManualIntensityChannel4 + 32;
-                  if (ManualIntensityChannel4 > 256){
-                    ManualIntensityChannel4 = 256;
+                  ManualIntensityChannel4 = ManualIntensityChannel4 + 1;
+                  if (ManualIntensityChannel4 > 19){
+                    ManualIntensityChannel4 = 19;
                   } 
                 }
                 //dw 
                 if (x_value < 100) {
-                  ManualIntensityChannel4 = ManualIntensityChannel4 - 32;
+                  ManualIntensityChannel4 = ManualIntensityChannel4 - 1;
                   if (ManualIntensityChannel4 < 0){
                     ManualIntensityChannel4 = 0;
                   }
@@ -950,17 +987,21 @@ void setValueManual(){
                 break;
               case 4:              
                 lcd.setCursor(0,1);
-                lcd.print("CH5 Level "+String(ManualIntensityChannel5*100/256)+"%   ");
+                if (ManualIntensityChannel5 == 0) {
+                  lcd.print("CH5 Level "+String(ManualIntensityChannel5*100/20)+"%   ");
+                } else {
+                  lcd.print("CH5 Level "+String((ManualIntensityChannel5+1)*100/20)+"%   ");
+                }
                 //up 
                 if (x_value > 900) {
-                  ManualIntensityChannel5 = ManualIntensityChannel5 + 32;
-                  if (ManualIntensityChannel5 > 256){
-                    ManualIntensityChannel5 = 256;
+                  ManualIntensityChannel5 = ManualIntensityChannel5 + 1;
+                  if (ManualIntensityChannel5 > 19){
+                    ManualIntensityChannel5 = 19;
                   } 
                 }
                 //dw 
                 if (x_value < 100) {
-                  ManualIntensityChannel5 = ManualIntensityChannel5 - 32;
+                  ManualIntensityChannel5 = ManualIntensityChannel5 - 1;
                   if (ManualIntensityChannel5 < 0){
                     ManualIntensityChannel5 = 0;
                   }
@@ -987,7 +1028,6 @@ void adjustIntensity(int Aim1,int Aim2,int Aim3,int Aim4,int Aim5, boolean gradu
            } else {
                 IntensityChannel1++;
            }
-           analogWrite(Channel1,IntensityChannel1);     
         }
         if (Aim2 != IntensityChannel2) {
            if(IntensityChannel2 > Aim2){
@@ -995,7 +1035,6 @@ void adjustIntensity(int Aim1,int Aim2,int Aim3,int Aim4,int Aim5, boolean gradu
            } else {
                 IntensityChannel2++;
            }     
-           analogWrite(Channel2,IntensityChannel2);
         }
         if (Aim3 != IntensityChannel3) {
            if(IntensityChannel3 > Aim3){
@@ -1003,7 +1042,6 @@ void adjustIntensity(int Aim1,int Aim2,int Aim3,int Aim4,int Aim5, boolean gradu
            } else {
                 IntensityChannel3++;
            }     
-           analogWrite(Channel3,IntensityChannel3);
         }
         if (Aim4 != IntensityChannel4) {
            if(IntensityChannel4 > Aim4){
@@ -1011,15 +1049,13 @@ void adjustIntensity(int Aim1,int Aim2,int Aim3,int Aim4,int Aim5, boolean gradu
            } else {
                 IntensityChannel4++;
            }     
-           analogWrite(Channel4,IntensityChannel4);
         }
         if (Aim5 != IntensityChannel5) {
            if(IntensityChannel5 > Aim5){
                 IntensityChannel5--;
            } else {
                 IntensityChannel5++;
-           }     
-           analogWrite(Channel5,IntensityChannel5);
+           }
         }
         delay(350);
     }
@@ -1029,11 +1065,6 @@ void adjustIntensity(int Aim1,int Aim2,int Aim3,int Aim4,int Aim5, boolean gradu
     IntensityChannel3=Aim3;
     IntensityChannel4=Aim4;
     IntensityChannel5=Aim5;
-    analogWrite(Channel1,IntensityChannel1);
-    analogWrite(Channel2,IntensityChannel2);
-    analogWrite(Channel3,IntensityChannel3);
-    analogWrite(Channel4,IntensityChannel4);
-    analogWrite(Channel5,IntensityChannel5);  
   }
 }
 
@@ -1043,53 +1074,53 @@ void Programa1(int hora, boolean gradually){
   lcd.setCursor(0,1);
   switch (hora) {
       case 1: //Amanecer
-        AimIntensityChannel1 = 128;
-        AimIntensityChannel2 = 64;
-        AimIntensityChannel3 = 64;
+        AimIntensityChannel1 = 9;
+        AimIntensityChannel2 = 4;
+        AimIntensityChannel3 = 4;
         AimIntensityChannel4 = 0;
-        AimIntensityChannel5 = 128;
+        AimIntensityChannel5 = 9;
         break; 
       case 2: //Mañana
-        AimIntensityChannel1 = 128;
-        AimIntensityChannel2 = 128;
-        AimIntensityChannel3 = 128;
+        AimIntensityChannel1 = 9;
+        AimIntensityChannel2 = 9;
+        AimIntensityChannel3 = 9;
         AimIntensityChannel4 = 0;
         AimIntensityChannel5 = 0;
         break;      
       case 3: //Media Mañana
-        AimIntensityChannel1 = 128;
-        AimIntensityChannel2 = 255;
-        AimIntensityChannel3 = 255;
+        AimIntensityChannel1 = 9;
+        AimIntensityChannel2 = 19;
+        AimIntensityChannel3 = 19;
         AimIntensityChannel4 = 0;
         AimIntensityChannel5 = 0; 
         break;    
       case 4: //Mediodia
-        AimIntensityChannel1 = 128;
-        AimIntensityChannel2 = 255;
-        AimIntensityChannel3 = 255;
-        AimIntensityChannel4 = 128;
-        AimIntensityChannel5 = 128;
+        AimIntensityChannel1 = 9;
+        AimIntensityChannel2 = 19;
+        AimIntensityChannel3 = 19;
+        AimIntensityChannel4 = 9;
+        AimIntensityChannel5 = 9;
         break;      
       case 5: //Tarde
-        AimIntensityChannel1 = 128;
-        AimIntensityChannel2 = 255;
-        AimIntensityChannel3 = 255;
+        AimIntensityChannel1 = 9;
+        AimIntensityChannel2 = 19;
+        AimIntensityChannel3 = 19;
         AimIntensityChannel4 = 0;
         AimIntensityChannel5 = 0;
         break;
       case 6: //Media tarde
-        AimIntensityChannel1 = 128;
-        AimIntensityChannel2 = 128;
-        AimIntensityChannel3 = 128;
+        AimIntensityChannel1 = 9;
+        AimIntensityChannel2 = 9;
+        AimIntensityChannel3 = 9;
         AimIntensityChannel4 = 0;
         AimIntensityChannel5 = 0;
         break;  
       case 7: //Atardecer
-        AimIntensityChannel1 = 128;
-        AimIntensityChannel2 = 64;
-        AimIntensityChannel3 = 64;
+        AimIntensityChannel1 = 9;
+        AimIntensityChannel2 = 4;
+        AimIntensityChannel3 = 4;
         AimIntensityChannel4 = 0;
-        AimIntensityChannel5 = 128;
+        AimIntensityChannel5 = 9;
         break;      
       case 8: //Noche
         AimIntensityChannel1 = 0;
@@ -1109,52 +1140,52 @@ void Programa2(int hora, boolean gradually){
   switch (hora) {
       case 1: //Amanecer
         AimIntensityChannel1 = 0;
-        AimIntensityChannel2 = 64;
-        AimIntensityChannel3 = 128;
+        AimIntensityChannel2 = 4;
+        AimIntensityChannel3 = 9;
         AimIntensityChannel4 = 0;
-        AimIntensityChannel5 = 128;
+        AimIntensityChannel5 = 9;
         break; 
       case 2: //Mañana
         AimIntensityChannel1 = 0;
-        AimIntensityChannel2 = 128;
-        AimIntensityChannel3 = 192;
+        AimIntensityChannel2 = 9;
+        AimIntensityChannel3 = 14;
         AimIntensityChannel4 = 0;
         AimIntensityChannel5 = 0;
         break;      
       case 3: //Media Mañana
-        AimIntensityChannel1 = 128;
-        AimIntensityChannel2 = 255;
-        AimIntensityChannel3 = 255;
+        AimIntensityChannel1 = 9;
+        AimIntensityChannel2 = 19;
+        AimIntensityChannel3 = 19;
         AimIntensityChannel4 = 0;
         AimIntensityChannel5 = 0; 
         break;    
       case 4: //Mediodia
-        AimIntensityChannel1 = 128;
-        AimIntensityChannel2 = 255;
-        AimIntensityChannel3 = 255;
-        AimIntensityChannel4 = 128;
-        AimIntensityChannel5 = 128;
+        AimIntensityChannel1 = 9;
+        AimIntensityChannel2 = 19;
+        AimIntensityChannel3 = 19;
+        AimIntensityChannel4 = 9;
+        AimIntensityChannel5 = 9;
         break;      
       case 5: //Tarde
-        AimIntensityChannel1 = 128;
-        AimIntensityChannel2 = 255;
-        AimIntensityChannel3 = 255;
+        AimIntensityChannel1 = 9;
+        AimIntensityChannel2 = 19;
+        AimIntensityChannel3 = 19;
         AimIntensityChannel4 = 0;
         AimIntensityChannel5 = 0;
         break;
       case 6: //Media tarde
         AimIntensityChannel1 = 0;
-        AimIntensityChannel2 = 128;
-        AimIntensityChannel3 = 192;
+        AimIntensityChannel2 = 9;
+        AimIntensityChannel3 = 14;
         AimIntensityChannel4 = 0;
         AimIntensityChannel5 = 0;
         break;  
       case 7: //Atardecer
         AimIntensityChannel1 = 0;
-        AimIntensityChannel2 = 64;
-        AimIntensityChannel3 = 128;
+        AimIntensityChannel2 = 4;
+        AimIntensityChannel3 = 9;
         AimIntensityChannel4 = 0;
-        AimIntensityChannel5 = 128;
+        AimIntensityChannel5 = 9;
         break;      
       case 8: //Noche
         AimIntensityChannel1 = 0;
@@ -1173,53 +1204,53 @@ void Programa3(int hora, boolean gradually){
   lcd.setCursor(0,1);
   switch (hora) {
       case 1: //Amanecer
-        AimIntensityChannel1 = 128;
-        AimIntensityChannel2 = 64;
-        AimIntensityChannel3 = 64;
+        AimIntensityChannel1 = 9;
+        AimIntensityChannel2 = 4;
+        AimIntensityChannel3 = 4;
         AimIntensityChannel4 = 0;
-        AimIntensityChannel5 = 128;
+        AimIntensityChannel5 = 9;
         break; 
       case 2: //Mañana
-        AimIntensityChannel1 = 128;
-        AimIntensityChannel2 = 128;
-        AimIntensityChannel3 = 128;
+        AimIntensityChannel1 = 9;
+        AimIntensityChannel2 = 9;
+        AimIntensityChannel3 = 9;
         AimIntensityChannel4 = 0;
         AimIntensityChannel5 = 0;
         break;      
       case 3: //Media Mañana
-        AimIntensityChannel1 = 128;
-        AimIntensityChannel2 = 255;
-        AimIntensityChannel3 = 255;
+        AimIntensityChannel1 = 9;
+        AimIntensityChannel2 = 19;
+        AimIntensityChannel3 = 19;
         AimIntensityChannel4 = 0;
         AimIntensityChannel5 = 0; 
         break;    
       case 4: //Mediodia
-        AimIntensityChannel1 = 128;
-        AimIntensityChannel2 = 255;
-        AimIntensityChannel3 = 255;
-        AimIntensityChannel4 = 128;
-        AimIntensityChannel5 = 128;
+        AimIntensityChannel1 = 9;
+        AimIntensityChannel2 = 19;
+        AimIntensityChannel3 = 19;
+        AimIntensityChannel4 = 9;
+        AimIntensityChannel5 = 9;
         break;      
       case 5: //Tarde
-        AimIntensityChannel1 = 128;
-        AimIntensityChannel2 = 255;
-        AimIntensityChannel3 = 255;
+        AimIntensityChannel1 = 9;
+        AimIntensityChannel2 = 19;
+        AimIntensityChannel3 = 19;
         AimIntensityChannel4 = 0;
         AimIntensityChannel5 = 0;
         break;
       case 6: //Media tarde
-        AimIntensityChannel1 = 128;
-        AimIntensityChannel2 = 128;
-        AimIntensityChannel3 = 128;
+        AimIntensityChannel1 = 9;
+        AimIntensityChannel2 = 9;
+        AimIntensityChannel3 = 9;
         AimIntensityChannel4 = 0;
         AimIntensityChannel5 = 0;
         break;  
       case 7: //Atardecer
-        AimIntensityChannel1 = 128;
-        AimIntensityChannel2 = 64;
-        AimIntensityChannel3 = 64;
+        AimIntensityChannel1 = 9;
+        AimIntensityChannel2 = 4;
+        AimIntensityChannel3 = 4;
         AimIntensityChannel4 = 0;
-        AimIntensityChannel5 = 128;
+        AimIntensityChannel5 = 9;
         break;      
       case 8: //Noche
         AimIntensityChannel1 = 0;
@@ -1240,52 +1271,52 @@ void Programa4(int hora, boolean gradually){
   switch (hora) {
       case 1: //Amanecer
         AimIntensityChannel1 = 0;
-        AimIntensityChannel2 = 64;
-        AimIntensityChannel3 = 128;
+        AimIntensityChannel2 = 4;
+        AimIntensityChannel3 = 9;
         AimIntensityChannel4 = 0;
-        AimIntensityChannel5 = 128;
+        AimIntensityChannel5 = 9;
         break; 
       case 2: //Mañana
         AimIntensityChannel1 = 0;
-        AimIntensityChannel2 = 128;
-        AimIntensityChannel3 = 192;
+        AimIntensityChannel2 = 9;
+        AimIntensityChannel3 = 14;
         AimIntensityChannel4 = 0;
         AimIntensityChannel5 = 0;
         break;      
       case 3: //Media Mañana
-        AimIntensityChannel1 = 128;
-        AimIntensityChannel2 = 255;
-        AimIntensityChannel3 = 255;
+        AimIntensityChannel1 = 9;
+        AimIntensityChannel2 = 19;
+        AimIntensityChannel3 = 19;
         AimIntensityChannel4 = 0;
         AimIntensityChannel5 = 0; 
         break;    
       case 4: //Mediodia
-        AimIntensityChannel1 = 128;
-        AimIntensityChannel2 = 255;
-        AimIntensityChannel3 = 255;
-        AimIntensityChannel4 = 128;
-        AimIntensityChannel5 = 128;
+        AimIntensityChannel1 = 9;
+        AimIntensityChannel2 = 19;
+        AimIntensityChannel3 = 19;
+        AimIntensityChannel4 = 9;
+        AimIntensityChannel5 = 9;
         break;      
       case 5: //Tarde
-        AimIntensityChannel1 = 128;
-        AimIntensityChannel2 = 255;
-        AimIntensityChannel3 = 255;
+        AimIntensityChannel1 = 9;
+        AimIntensityChannel2 = 19;
+        AimIntensityChannel3 = 19;
         AimIntensityChannel4 = 0;
         AimIntensityChannel5 = 0;
         break;
       case 6: //Media tarde
         AimIntensityChannel1 = 0;
-        AimIntensityChannel2 = 128;
-        AimIntensityChannel3 = 192;
+        AimIntensityChannel2 = 9;
+        AimIntensityChannel3 = 14;
         AimIntensityChannel4 = 0;
         AimIntensityChannel5 = 0;
         break;  
       case 7: //Atardecer
         AimIntensityChannel1 = 0;
-        AimIntensityChannel2 = 64;
-        AimIntensityChannel3 = 128;
+        AimIntensityChannel2 = 4;
+        AimIntensityChannel3 = 9;
         AimIntensityChannel4 = 0;
-        AimIntensityChannel5 = 128;
+        AimIntensityChannel5 = 9;
         break;      
       case 8: //Noche
         AimIntensityChannel1 = 0;
@@ -1306,52 +1337,52 @@ void Programa5(int hora, boolean gradually){
   switch (hora) {
       case 1: //Amanecer
         AimIntensityChannel1 = 0;
-        AimIntensityChannel2 = 64;
-        AimIntensityChannel3 = 128;
+        AimIntensityChannel2 = 4;
+        AimIntensityChannel3 = 9;
         AimIntensityChannel4 = 0;
-        AimIntensityChannel5 = 128;
+        AimIntensityChannel5 = 9;
         break; 
       case 2: //Mañana
         AimIntensityChannel1 = 0;
-        AimIntensityChannel2 = 128;
-        AimIntensityChannel3 = 192;
+        AimIntensityChannel2 = 9;
+        AimIntensityChannel3 = 14;
         AimIntensityChannel4 = 0;
         AimIntensityChannel5 = 0;
         break;      
       case 3: //Media Mañana
-        AimIntensityChannel1 = 128;
-        AimIntensityChannel2 = 255;
-        AimIntensityChannel3 = 255;
+        AimIntensityChannel1 = 9;
+        AimIntensityChannel2 = 19;
+        AimIntensityChannel3 = 19;
         AimIntensityChannel4 = 0;
         AimIntensityChannel5 = 0; 
         break;    
       case 4: //Mediodia
-        AimIntensityChannel1 = 128;
-        AimIntensityChannel2 = 255;
-        AimIntensityChannel3 = 255;
-        AimIntensityChannel4 = 128;
-        AimIntensityChannel5 = 128;
+        AimIntensityChannel1 = 9;
+        AimIntensityChannel2 = 19;
+        AimIntensityChannel3 = 19;
+        AimIntensityChannel4 = 9;
+        AimIntensityChannel5 = 9;
         break;      
       case 5: //Tarde
-        AimIntensityChannel1 = 128;
-        AimIntensityChannel2 = 255;
-        AimIntensityChannel3 = 255;
+        AimIntensityChannel1 = 9;
+        AimIntensityChannel2 = 19;
+        AimIntensityChannel3 = 19;
         AimIntensityChannel4 = 0;
         AimIntensityChannel5 = 0;
         break;
       case 6: //Media tarde
         AimIntensityChannel1 = 0;
-        AimIntensityChannel2 = 128;
-        AimIntensityChannel3 = 192;
+        AimIntensityChannel2 = 9;
+        AimIntensityChannel3 = 14;
         AimIntensityChannel4 = 0;
         AimIntensityChannel5 = 0;
         break;  
       case 7: //Atardecer
         AimIntensityChannel1 = 0;
-        AimIntensityChannel2 = 64;
-        AimIntensityChannel3 = 128;
+        AimIntensityChannel2 = 4;
+        AimIntensityChannel3 = 9;
         AimIntensityChannel4 = 0;
-        AimIntensityChannel5 = 128;
+        AimIntensityChannel5 = 9;
         break;      
       case 8: //Noche
         AimIntensityChannel1 = 0;
@@ -1530,4 +1561,42 @@ boolean esHoraNoche(){
   } else {
     return false;
   }
+}
+
+ISR(TIMER1_COMPA_vect){  //change the 0 to 1 for timer1 and 2 for timer2
+   //interrupt commands here
+   interrupt_timer++;
+   if(interrupt_timer > 19){
+      interrupt_timer = 0;
+      if (IntensityChannel1 != interrupt_timer){
+        digitalWrite(Channel1,HIGH);
+      }
+      if (IntensityChannel2 != interrupt_timer){
+        digitalWrite(Channel2,HIGH);
+      }
+      if (IntensityChannel3 != interrupt_timer){
+        digitalWrite(Channel3,HIGH);
+      }
+      if (IntensityChannel4 != interrupt_timer){
+        digitalWrite(Channel4,HIGH);
+      }
+      if (IntensityChannel5 != interrupt_timer){
+        digitalWrite(Channel5,HIGH);
+      }
+   } 
+   if (IntensityChannel1 == interrupt_timer){
+      digitalWrite(Channel1,LOW);
+   }
+   if (IntensityChannel2 == interrupt_timer){
+      digitalWrite(Channel2,LOW);
+   }
+   if (IntensityChannel3 == interrupt_timer){
+      digitalWrite(Channel3,LOW);
+   }
+   if (IntensityChannel4 == interrupt_timer){
+      digitalWrite(Channel4,LOW);
+   }
+   if (IntensityChannel5 == interrupt_timer){
+      digitalWrite(Channel5,LOW);
+   }
 }
