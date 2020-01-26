@@ -107,6 +107,7 @@ void changeTime();
 void setProgram();
 void setManual();
 void setValueManual();
+void setDemo();
 
 void adjustIntensity(int, int, int, int, int, boolean);
 
@@ -179,6 +180,7 @@ void loop() {
   lcd.setCursor(0,1);
   value = digitalRead(SW_pin);  //lectura digital de pin 
   if (value == LOW) {
+    delay(1000);
       if (displayapagado==false) {
       //  lcd.print("Menu        ");
         enterMenu();
