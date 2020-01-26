@@ -44,6 +44,7 @@ int AimIntensityChannel4 = 0;
 int AimIntensityChannel5 = 0;
 
 int manual = 1;
+boolean demoOn = false;
 
 int ManualIntensityChannel1 = 9;
 int ManualIntensityChannel2 = 9;
@@ -178,7 +179,6 @@ void loop() {
   lcd.setCursor(0,1);
   value = digitalRead(SW_pin);  //lectura digital de pin 
   if (value == LOW) {
-    delay(500);
       if (displayapagado==false) {
       //  lcd.print("Menu        ");
         enterMenu();
@@ -605,6 +605,9 @@ void enterMenu(){
               lcd.print("[ ] Set Manual  ");
               break;
             case 4:
+              lcd.print("[ ] Demo         ");
+              break;
+            case 5:
               lcd.print("[ ] Exit        ");
               break;
       }
@@ -616,10 +619,10 @@ void enterMenu(){
          // o puedes salir con break*/
         x_value = analogRead(X_pin);
         y_value = analogRead(Y_pin);
-        if (y_value > 900) {
-            opcion = 0;
-            break;
-        }
+        //if (y_value > 900) {
+        //    opcion = 0;
+        //    break;
+        //}
         value = digitalRead(SW_pin);  //set 
         if (value == LOW) {
             switch (opcion) {
@@ -628,23 +631,30 @@ void enterMenu(){
                 lcd.print("[*] Set Time    ");
                 delay(1000);
                 changeTime();
-                opcion = 4;
+                opcion = 5;
                 break;
               case 2:
                 lcd.setCursor(0,0);
                 lcd.print("[*] Set Program ");
                 delay(1000);
                 setProgram();
-                opcion = 4;
+                opcion = 5;
                 break;
               case 3:
                 lcd.setCursor(0,0);
                 lcd.print("[*] Set Manual   ");
                 delay(1000);
                 setManual();
-                opcion = 4;
+                opcion = 5;
                 break;
               case 4:
+                lcd.setCursor(0,0);
+                lcd.print("[*] Demo          ");
+                delay(1000);
+                setDemo();
+                opcion = 5;
+                break;
+              case 5:
                 lcd.setCursor(0,0);
                 lcd.print("[*] Exit         ");
                 delay(1000);
@@ -656,7 +666,7 @@ void enterMenu(){
         //up 
         if (x_value > 900) {
             opcion++;
-            if (opcion == 5){
+            if (opcion == 6){
               opcion = 1;
             }
             //delay(1000);
@@ -666,7 +676,7 @@ void enterMenu(){
         if (x_value < 100) {
             opcion--;
             if (opcion == 0){
-              opcion = 4;
+              opcion = 5;
             }
             //delay(1000);
             break;
@@ -828,44 +838,48 @@ void setProgram(){
 }
 
 void setManual(){
-    lcd.setCursor(0,0);
-    lcd.print("Manual Mode     ");
-    lcd.setCursor(0,1);
-    if (manual == 2){
-        lcd.print("[ON] Manual     ");
-    } else {
-        lcd.print("[OFF] Manual    ");
-    }
     int opcionmanual = 1;
     int valuemanual;
     //unsigned long finishhora = millis()+120000UL; // cargo a start con el valor +10mil milisegundos
     //while (millis() < finishhora || opcionhora != 0) {
     while (opcionmanual != 0) {
           delay(200);
+          lcd.setCursor(0,0);
+          lcd.print("Manual Mode     ");
+          lcd.setCursor(0,1);
+          if (manual == 2){
+              lcd.print("[ON] Manual     ");
+          } else {
+              lcd.print("[OFF] Manual    ");
+          }
           x_value = analogRead(X_pin);
           y_value = analogRead(Y_pin);
           //back
           if (y_value > 900) {
+              delay(1000);
               opcionmanual = 0;
           }
           valuemanual = digitalRead(SW_pin);  //set 
           if (valuemanual == LOW) {
+              delay(1000);
               if (manual == 2){
+                lcd.setCursor(0,1);
                 lcd.print("[OFF] Manual     ");
-                delay(500);
+                delay(1500);
                 manual = 1;
-                ManualIntensityChannel1 = 10;
-                ManualIntensityChannel2 = 10;
-                ManualIntensityChannel3 = 10;
-                ManualIntensityChannel4 = 10;
-                ManualIntensityChannel5 = 10;
-                opcionmanual = 0; 
+                //ManualIntensityChannel1 = 10;
+                //ManualIntensityChannel2 = 10;
+                //ManualIntensityChannel3 = 10;
+                //ManualIntensityChannel4 = 10;
+                //ManualIntensityChannel5 = 10;
+                //opcionmanual = 0; 
               } else {
+                lcd.setCursor(0,1);
                 lcd.print("[ON] Manual     ");
-                delay(500);
+                delay(1500);
                 manual = 2;
                 setValueManual();
-                opcionmanual = 0;
+                //opcionmanual = 0;
               }
           }        
     }
@@ -874,7 +888,8 @@ void setManual(){
 void setValueManual(){
       lcd.setCursor(0,1);
       boolean exit = false;
-      for (int index=0; index < 5; index++){
+      int index=0;
+      while (index < 5){
           while (!exit){
             delay(200);
             x_value = analogRead(X_pin);
@@ -902,10 +917,38 @@ void setValueManual(){
                     ManualIntensityChannel1 = 0;
                   }
                 }
+                //next 
+                if (y_value > 900) {
+                  delay(500);
+                  index++;
+                  if(index == 5) {
+                    index = 0;
+                  }
+                }
+                //previous 
+                if (y_value < 100) {
+                    delay(500);
+                    index--;
+                    if(index < 0 ) {
+                      index = 4;
+                    }
+                }
                 value = digitalRead(SW_pin);  //up 
                 if (value == LOW) {
-                  exit = true;
-                }    
+                  delay(1000);
+                  lcd.setCursor(0,1);
+                  lcd.print("Exit?  [OK]     ");
+                  int confirm = 0;
+                  unsigned long finish = millis()+3000UL; // cargo a start con el valor +10mil milisegundos
+                  while (millis() < finish && confirm == 0) {
+                    value = digitalRead(SW_pin);  //up 
+                    if (value == LOW) {
+                      confirm = 1;
+                      index = 5;
+                      exit = true;
+                    }
+                  }
+                }   
                 break;
               case 1:
                 lcd.setCursor(0,1);
@@ -928,9 +971,37 @@ void setValueManual(){
                     ManualIntensityChannel2 = 0;
                   }
                 }
+                //next 
+                if (y_value > 900) {
+                  delay(500);
+                  index++;
+                  if(index == 5) {
+                    index = 0;
+                  }
+                }
+                //previous 
+                if (y_value < 100) {
+                    delay(500);
+                    index--;
+                    if(index < 0 ) {
+                      index = 4;
+                    }
+                }
                 value = digitalRead(SW_pin);  //up 
                 if (value == LOW) {
-                  exit = true;
+                  delay(1000);
+                  lcd.setCursor(0,1);
+                  lcd.print("Exit?  [OK]     ");
+                  int confirm = 0;
+                  unsigned long finish = millis()+3000UL; // cargo a start con el valor +10mil milisegundos
+                  while (millis() < finish && confirm == 0) {
+                    value = digitalRead(SW_pin);  //up 
+                    if (value == LOW) {
+                      confirm = 1;
+                      index = 5;
+                      exit = true;
+                    }
+                  }
                 }    
                 break;
               case 2:
@@ -954,10 +1025,38 @@ void setValueManual(){
                     ManualIntensityChannel3 = 0;
                   }
                 }
+                //next 
+                if (y_value > 900) {
+                  delay(500);
+                  index++;
+                  if(index == 5) {
+                    index = 0;
+                  }
+                }
+                //previous 
+                if (y_value < 100) {
+                    delay(500);
+                    index--;
+                    if(index < 0 ) {
+                      index = 4;
+                    }
+                }
                 value = digitalRead(SW_pin);  //up 
                 if (value == LOW) {
-                  exit = true;
-                }    
+                  delay(1000);
+                  lcd.setCursor(0,1);
+                  lcd.print("Exit?  [OK]     ");
+                  int confirm = 0;
+                  unsigned long finish = millis()+3000UL; // cargo a start con el valor +10mil milisegundos
+                  while (millis() < finish && confirm == 0) {
+                    value = digitalRead(SW_pin);  //up 
+                    if (value == LOW) {
+                      confirm = 1;
+                      index = 5;
+                      exit = true;
+                    }
+                  }
+                }  
                 break;
               case 3:            
                 lcd.setCursor(0,1);
@@ -980,10 +1079,38 @@ void setValueManual(){
                     ManualIntensityChannel4 = 0;
                   }
                 }
+                //next 
+                if (y_value > 900) {
+                  delay(500);
+                  index++;
+                  if(index == 5) {
+                    index = 0;
+                  }
+                }
+                //previous 
+                if (y_value < 100) {
+                    delay(500);
+                    index--;
+                    if(index < 0 ) {
+                      index = 4;
+                    }
+                }
                 value = digitalRead(SW_pin);  //up 
                 if (value == LOW) {
-                  exit = true;
-                }    
+                  delay(1000);
+                  lcd.setCursor(0,1);
+                  lcd.print("Exit?  [OK]     ");
+                  int confirm = 0;
+                  unsigned long finish = millis()+3000UL; // cargo a start con el valor +10mil milisegundos
+                  while (millis() < finish && confirm == 0) {
+                    value = digitalRead(SW_pin);  //up 
+                    if (value == LOW) {
+                      confirm = 1;
+                      index = 5;
+                      exit = true;
+                    }
+                  }
+                }  
                 break;
               case 4:              
                 lcd.setCursor(0,1);
@@ -1006,9 +1133,37 @@ void setValueManual(){
                     ManualIntensityChannel5 = 0;
                   }
                 }
+                //next 
+                if (y_value > 900) {
+                  delay(500);
+                  index++;
+                  if(index == 5) {
+                    index = 0;
+                  }
+                }
+                //previous 
+                if (y_value < 100) {
+                    delay(500);
+                    index--;
+                    if(index < 0 ) {
+                      index = 4;
+                    }
+                }
                 value = digitalRead(SW_pin);  //up 
                 if (value == LOW) {
-                  exit = true;
+                  delay(1000);
+                  lcd.setCursor(0,1);
+                  lcd.print("Exit?  [OK]     ");
+                  int confirm = 0;
+                  unsigned long finish = millis()+3000UL; // cargo a start con el valor +10mil milisegundos
+                  while (millis() < finish && confirm == 0) {
+                    value = digitalRead(SW_pin);  //up 
+                    if (value == LOW) {
+                      confirm = 1;
+                      index = 5;
+                      exit = true;
+                    }
+                  }
                 }    
                 break;            
             }
@@ -1017,6 +1172,196 @@ void setValueManual(){
           
       }
       adjustIntensity(ManualIntensityChannel1, ManualIntensityChannel2, ManualIntensityChannel3, ManualIntensityChannel4, ManualIntensityChannel5, false);
+}
+
+void setDemo(){
+   boolean exitDemo = false;
+   demoOn = true;
+   //Los tiempos deben ser mayores de 90s para permitir el ciclo completo de cambio gradual
+   unsigned long amanecer = millis();
+   unsigned long manana1 = millis()+120000UL;
+   unsigned long manana2 = millis()+240000UL;
+   unsigned long mediodia = millis()+360000UL;
+   unsigned long tarde1 = millis()+480000UL;
+   unsigned long tarde2 = millis()+600000UL;
+   unsigned long atardecer = millis()+720000UL;
+   unsigned long noche = millis()+840000UL;
+   unsigned long finish = millis()+960000UL; // cargo a start con el valor +10mil milisegundos
+   lcd.setCursor(0,0);
+   lcd.print("DEMO Cancel [OK]");
+   lcd.setCursor(0,1);
+   lcd.print(" Amanecer       ");
+   switch (ProgramaSeleccionado) {
+     case 1:
+       Programa1(1, true);
+       break;
+     case 2:
+       Programa2(1, true);
+       break;
+     case 3:
+       Programa3(1, true);
+       break;
+     case 4:
+       Programa4(1, true);
+       break;
+     case 5:
+       Programa5(1, true);
+       break;  
+   }   
+   while (millis() < finish && exitDemo == false) {
+      value = digitalRead(SW_pin);  //up 
+      if (value == LOW) {
+        delay(1000);
+        exitDemo = true;
+      }
+      if (millis() == manana1 ){
+          lcd.setCursor(0,1);
+          lcd.print(" Manana1        ");
+          switch (ProgramaSeleccionado) {
+            case 1:
+              Programa1(2, true);
+              break;
+            case 2:
+              Programa2(2, true);
+              break;
+            case 3:
+              Programa3(2, true);
+              break;
+            case 4:
+              Programa4(2, true);
+              break;
+            case 5:
+              Programa5(2, true);
+              break;  
+          }      
+        } else if (millis() == manana2 ){
+          lcd.setCursor(0,1);
+          lcd.print(" Manana2        ");
+          switch (ProgramaSeleccionado) {
+                case 1:
+                  Programa1(3, true);
+                  break;
+                case 2:
+                  Programa2(3, true);
+                  break;
+                case 3:
+                  Programa3(3, true);
+                  break;
+                case 4:
+                  Programa4(3, true);
+                  break;
+                case 5:
+                  Programa5(3, true);
+                  break;  
+              }      
+        } else if (millis() == mediodia ){
+          lcd.setCursor(0,1);
+          lcd.print(" Mediodia        ");
+          switch (ProgramaSeleccionado) {
+                case 1:
+                  Programa1(4, true);
+                  break;
+                case 2:
+                  Programa2(4, true);
+                  break;
+                case 3:
+                  Programa3(4, true);
+                  break;
+                case 4:
+                  Programa4(4, true);
+                  break;
+                case 5:
+                  Programa5(4, true);
+                  break;  
+              }  
+        } else if (millis() == tarde1 ){
+          lcd.setCursor(0,1);
+          lcd.print(" Tarde1         ");
+          switch (ProgramaSeleccionado) {
+                case 1:
+                  Programa1(5, true);
+                  break;
+                case 2:
+                  Programa2(5, true);
+                  break;
+                case 3:
+                  Programa3(5, true);
+                  break;
+                case 4:
+                  Programa4(5, true);
+                  break;
+                case 5:
+                  Programa5(5, true);
+                  break;  
+              }     
+        } else if (millis() == tarde2 ){
+          lcd.setCursor(0,1);
+          lcd.print(" Tarde2         ");
+          switch (ProgramaSeleccionado) {
+                case 1:
+                  Programa1(6, true);
+                  break;
+                case 2:
+                  Programa2(6, true);
+                  break;
+                case 3:
+                  Programa3(6, true);
+                  break;
+                case 4:
+                  Programa4(6, true);
+                  break;
+                case 5:
+                  Programa5(6, true);
+                  break;  
+              }      
+        } else if (millis() == atardecer ){
+          lcd.setCursor(0,1);
+          lcd.print(" Atardecer      ");
+          switch (ProgramaSeleccionado) {
+                case 1:
+                  Programa1(7, true);
+                  break;
+                case 2:
+                  Programa2(7, true);
+                  break;
+                case 3:
+                  Programa3(7, true);
+                  break;
+                case 4:
+                  Programa4(7, true);
+                  break;
+                case 5:
+                  Programa5(7, true);
+                  break;  
+              }      
+        } else if (millis() == noche ){
+            lcd.setCursor(0,1);
+            lcd.print(" Noche          ");
+            switch (ProgramaSeleccionado) {
+                case 1:
+                  Programa1(8, true);
+                  break;
+                case 2:
+                  Programa2(8, true);
+                  break;
+                case 3:
+                  Programa3(8, true);
+                  break;
+                case 4:
+                  Programa4(8, true);
+                  break;
+                case 5:
+                  Programa5(8, true);
+                  break;  
+              }      
+        }
+   }
+   demoOn = false;
+   if (manual == 2) {
+      adjustIntensity(ManualIntensityChannel1, ManualIntensityChannel2, ManualIntensityChannel3, ManualIntensityChannel4, ManualIntensityChannel5, false);
+   } else {
+      initProgram();
+   }
 }
 
 void adjustIntensity(int Aim1,int Aim2,int Aim3,int Aim4,int Aim5, boolean gradually){
@@ -1057,7 +1402,11 @@ void adjustIntensity(int Aim1,int Aim2,int Aim3,int Aim4,int Aim5, boolean gradu
                 IntensityChannel5++;
            }
         }
-        delay(350);
+        if (demoOn == true){
+          delay(4500);
+        } else {
+          delay(30000);
+        }
     }
   } else {
     IntensityChannel1=Aim1;
@@ -1069,8 +1418,6 @@ void adjustIntensity(int Aim1,int Aim2,int Aim3,int Aim4,int Aim5, boolean gradu
 }
 
 void Programa1(int hora, boolean gradually){
-  lcd.setCursor(0,0);
-  lcd.print("Pr01 Updated    ");
   lcd.setCursor(0,1);
   switch (hora) {
       case 1: //Amanecer
@@ -1134,8 +1481,6 @@ void Programa1(int hora, boolean gradually){
 }
 
 void Programa2(int hora, boolean gradually){
-  lcd.setCursor(0,0);
-  lcd.print("Pr02 Updated    ");
   lcd.setCursor(0,1);
   switch (hora) {
       case 1: //Amanecer
@@ -1204,11 +1549,11 @@ void Programa3(int hora, boolean gradually){
   lcd.setCursor(0,1);
   switch (hora) {
       case 1: //Amanecer
-        AimIntensityChannel1 = 9;
-        AimIntensityChannel2 = 4;
-        AimIntensityChannel3 = 4;
+        AimIntensityChannel1 = 19;
+        AimIntensityChannel2 = 0;
+        AimIntensityChannel3 = 0;
         AimIntensityChannel4 = 0;
-        AimIntensityChannel5 = 9;
+        AimIntensityChannel5 = 19;
         break; 
       case 2: //Mañana
         AimIntensityChannel1 = 9;
@@ -1243,14 +1588,14 @@ void Programa3(int hora, boolean gradually){
         AimIntensityChannel2 = 9;
         AimIntensityChannel3 = 9;
         AimIntensityChannel4 = 0;
-        AimIntensityChannel5 = 0;
+        AimIntensityChannel5 = 9;
         break;  
       case 7: //Atardecer
-        AimIntensityChannel1 = 9;
-        AimIntensityChannel2 = 4;
-        AimIntensityChannel3 = 4;
+        AimIntensityChannel1 = 19;
+        AimIntensityChannel2 = 0;
+        AimIntensityChannel3 = 0;
         AimIntensityChannel4 = 0;
-        AimIntensityChannel5 = 9;
+        AimIntensityChannel5 = 19;
         break;      
       case 8: //Noche
         AimIntensityChannel1 = 0;
